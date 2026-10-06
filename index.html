@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HuyDuong — Portfolio</title>
+
+<style>
+
+/* ========================================
+   RESET & SWISS FOUNDATIONS
+======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: auto;
+}
+
+body {
+    font-family: "Helvetica World", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   TYPOGRAPHIC WIDOW PREVENTION
+========================================================= */
+
+h1, h2, h3,
+.logo,
+.project-title,
+.project-meta,
+.archive-title,
+.intro-kicker,
+.modal-title,
+.scene-title-item {
+    text-wrap: balance;
+}
+
+p,
+.intro-text,
+.about-entry,
+.modal-description,
+.meta-value {
+    text-wrap: pretty;
+}
+
+
+/* =========================================================
+   WHITE HEADER PANEL (HOUSES LOGO & CROSSFADING TITLES)
+========================================================= */
+
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 13vw;
+    background: #ffffff;
+    z-index: 70;
+    padding: 2.5vw 2.5vw 0 2.5vw;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 5vw;
+    pointer-events: none;
+    transition: height 0.35s ease, background-color 0.4s ease, color 0.4s ease;
+}
+
+.header-left,
+.header-right {
+    position: relative;
+    height: 100%;
+}
+
+/* BRAND LOGO */
+.logo {
+    display: inline-block;
+    font-size: clamp(48px, 5.2vw, 92px);
+    font-weight: 400;
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    pointer-events: auto;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: left top;
+    cursor: pointer;
+    margin-top: -1vw;
+}
+
+/* SECTION TITLES */
+.section-titles-wrap {
+    position: absolute;
+    top: 4.5vw;
+    left: 0;
+    width: 100%;
+    height: auto;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.scene-title-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: clamp(44px, 4.5vw, 80px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    margin: 0;
+    opacity: 0;
+    visibility: hidden;
+    will-change: opacity;
+    pointer-events: none;
+}
+
+/* NAVIGATION */
+.site-nav {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 1.5vw;
+    pointer-events: auto;
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+.nav-item {
+    font-size: 1.1vw;
+    font-weight: 400;
+    color: #999;
+    letter-spacing: -0.04em;
+    transition: color 0.3s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: #000;
+}
+
+
+/* =========================================================
+   HEADER STATES WHEN PROJECT VIEW IS OPEN
+========================================================= */
+
+body.project-open .logo {
+    transform: scale(0.55) !important;
+}
+
+body.project-open .section-titles-wrap,
+body.project-open .scene-title-item {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    display: none !important;
+}
+
+body.project-open .site-header {
+    height: 8.5vw !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+body.project-open .site-nav {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border-color: #000000 !important;
+}
+
+body.project-open .nav-item {
+    color: #999999 !important;
+}
+
+body.project-open .nav-item.active,
+body.project-open .nav-item:hover {
+    color: #000000 !important;
+}
+
+
+/* ========================================
+   NATURAL SCROLLING CONTENT STAGE
+======================================== */
+
+.main-content {
+    position: relative;
+    padding-top: 14vw;
+    padding-left: 2.5vw;
+    padding-right: 2.5vw;
+}
+
+
+/* ========================================
+   SECTION 1: ABOUT
+======================================== */
+
+#aboutSection {
+    min-height: calc(100vh - 11.5vw);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 5vw;
+    padding-bottom: 15vh;
+}
+
+.about-left {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+
+.portrait-sticky {
+    position: sticky;
+    top: 15.2vw;
+    width: min(34vw, 480px);
+    align-self: flex-start;
+}
+
+.portrait {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    background: #eee;
+}
+
+.about-right {
+    position: relative;
+    padding-top: 1vw;
+}
+
+.intro-kicker {
+    font-size: 1.2vw;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 0.8vw;
+}
+
+.intro-text {
+    font-size: 1.2vw;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    max-width: 620px;
+    margin-bottom: 4vw;
+}
+
+.about-block {
+    border-top: 1.5px solid #000;
+    padding: 1.5vw 0 2.5vw;
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    font-size: 1.1vw;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+}
+
+.about-label {
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vw;
+}
+
+.about-entry {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1vw;
+}
+
+.about-entry strong {
+    font-weight: 700;
+}
+
+.entry-role {
+    font-weight: 500;
+    color: #222222;
+    display: inline-block;
+    text-align: left;
+}
+
+.about-entry > span {
+    text-align: right;
+    color: #555;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   SECTION 2: WORKS (STICKY CROSSFADING MEDIA + SCROLLING TITLES)
+========================================================= */
+
+.works-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 5vw;
+    align-items: start;
+}
+
+.works-media-sticky {
+    position: sticky;
+    top: 15.2vw;
+    height: calc(100vh - 15vw);
+    min-height: 480px;
+}
+
+.works-media-item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.works-media-item.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.works-media-item img,
+.works-media-item video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    filter: grayscale(100%);
+    transition: filter 0.4s ease;
+}
+
+.works-media-item.hovered img,
+.works-media-item.hovered video {
+    filter: grayscale(0%);
+}
+
+.works-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-row {
+    min-height: max(550px, calc(100vh - 11.5vw));
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Inline artwork: only shown on mobile, where the sticky column is hidden */
+.row-media {
+    display: none;
+}
+
+.row-media img,
+.row-media video {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    filter: grayscale(100%);
+    transition: filter 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+.project-row:hover .row-media img,
+.project-row:hover .row-media video {
+    filter: grayscale(0%);
+    transform: scale(1.01);
+}
+
+.row-info {
+    user-select: none;
+}
+
+.project-title {
+    font-size: clamp(44px, 4.5vw, 80px);
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+    font-weight: 400;
+    transition: transform 0.3s ease;
+}
+
+.project-row:hover .project-title {
+    transform: translateX(1vw);
+}
+
+.project-meta {
+    margin-top: 1.2vw;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.4vw;
+    font-size: 1.15vw;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+}
+
+.project-category {
+    order: 1;
+    color: #777777;
+}
+
+.project-category::after {
+    content: " —";
+    margin-left: 0.2vw;
+}
+
+.project-year {
+    display: inline;
+    order: 2;
+    color: #777777;
+}
+
+
+/* =========================================================
+   SECTION 3: ARCHIVES (UNCROPPED 5-COLUMN CATALOG GRID)
+========================================================= */
+
+#archivesSection {
+    padding-top: 2vw;
+    padding-bottom: 20vh;
+}
+
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 2.5vw;
+    row-gap: 5.5vw;
+    width: 100%;
+    align-items: start;
+}
+
+.archive-item {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    align-self: start;
+}
+
+.archive-media {
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    position: relative;
+}
+
+.archive-media img,
+.archive-media video {
+    width: 100%;
+    height: auto;
+    max-height: 50vw;
+    display: block;
+    object-fit: contain;
+    filter: grayscale(100%);
+    transition: filter 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+.archive-item:hover .archive-media img,
+.archive-item:hover .archive-media video {
+    filter: grayscale(0%);
+    transform: scale(1.02);
+}
+
+.archive-info {
+    margin-top: 0.3vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.archive-title,
+.archive-meta {
+    line-height: 1.1;
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+}
+
+.archive-title {
+    font-size: 0.7vw;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: #000000;
+}
+
+.archive-meta {
+    font-size: 0.7vw;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #666666;
+    margin-top: 0em;
+}
+
+.archive-item:hover .archive-title,
+.archive-item:hover .archive-meta {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   DEDICATED FULL-PAGE PROJECT VIEW
+========================================================= */
+
+.project-page {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 60;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 8.5vw 2.5vw;
+}
+
+.project-page.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.project-page-inner {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.modal-hero-media {
+    width: 100%;
+    margin-bottom: 2.5vw;
+    background: #000000;
+    overflow: hidden;
+}
+
+.modal-hero-media img.modal-media-item {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.modal-hero-media video.modal-media-item {
+    width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3vw;
+    align-items: start;
+    padding-bottom: 4vw;
+    margin-bottom: 4vw;
+}
+
+.modal-col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8vw;
+}
+
+.modal-title-wrap {
+    position: relative;
+}
+
+.modal-title {
+    font-size: clamp(28px, 2.8vw, 52px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    margin: 0;
+    color: #000000;
+}
+
+.modal-meta-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8vw;
+    width: 100%;
+    margin-top: 0.5vw;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 1.5vw;
+}
+
+.meta-label {
+    min-width: 5.5vw;
+    font-size: 1.05vw;
+    font-weight: 700;
+    color: #000000;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+}
+
+.meta-value {
+    font-size: 1.05vw;
+    font-weight: 400;
+    color: #000000;
+    letter-spacing: -0.03em;
+    text-align: left;
+}
+
+.meta-team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35vw;
+}
+
+.team-member {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3em 0.5vw;
+}
+
+.team-name {
+    font-weight: 700;
+    color: #000000;
+    white-space: nowrap;
+}
+
+.team-role {
+    font-weight: 400;
+    color: #666666;
+}
+
+.team-role::before {
+    content: "—";
+    margin-right: 0.4vw;
+}
+
+.modal-col-right {
+    position: relative;
+}
+
+.modal-description {
+    font-size: clamp(18px, 1.65vw, 30px);
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+    margin: 0;
+    color: #000000;
+}
+
+.modal-description p {
+    margin-bottom: 1.5vw;
+}
+
+.modal-description p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-gallery-media {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5vw;
+    margin-bottom: 5vw;
+}
+
+.modal-gallery-media img,
+.modal-gallery-media video {
+    width: 100%;
+    display: block;
+    background: #f4f4f4;
+    grid-column: span 1;
+}
+
+/* Every 3rd item (1st, 4th, 7th...) spans both columns */
+.modal-gallery-media img:nth-child(3n + 1),
+.modal-gallery-media video:nth-child(3n + 1) {
+    grid-column: span 2;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* is-landscape / is-portrait are added by JS once the media size is known */
+.modal-gallery-media img.is-landscape:not(:nth-child(3n + 1)),
+.modal-gallery-media video.is-landscape:not(:nth-child(3n + 1)) {
+    aspect-ratio: 5 / 3;
+    object-fit: cover;
+    object-position: center;
+    background: #fdfdfd;
+}
+
+.modal-gallery-media img.is-portrait:not(:nth-child(3n + 1)),
+.modal-gallery-media video.is-portrait:not(:nth-child(3n + 1)) {
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center;
+}
+
+.modal-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 3vw;
+    padding-top: 2vw;
+    border-top: 1.5px solid #000;
+    font-size: 1.1vw;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.modal-nav-btn {
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.modal-nav-btn:hover {
+    opacity: 0.5;
+}
+
+.modal-nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+
+.back-to-work-btn {
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.back-to-work-btn:hover {
+    opacity: 0.5;
+}
+
+
+/* =========================================================
+   SECTION 4: CONTACT
+========================================================= */
+
+.contact-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.contact-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vw;
+    text-align: center;
+}
+
+.contact-inner a {
+    font-size: 1.2vw;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: #000000;
+    transition: opacity 0.3s ease;
+}
+
+.contact-inner a:hover {
+    opacity: 0.5;
+}
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+        opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+
+/* ========================================
+   MOBILE & TABLET RESPONSIVENESS
+======================================== */
+
+@media (max-width: 1024px) {
+    .archive-grid {
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 3.5vw;
+        row-gap: 7vw;
+    }
+
+    .archive-title,
+    .archive-meta {
+        font-size: 1.8vw;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* ---- Dark UI (toggled by JS while the Selected Work section is on screen) ---- */
+    body.dark-ui .site-header {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    body.dark-ui .site-nav {
+        background-color: rgba(0, 0, 0, 0.95);
+        border-color: #333333;
+    }
+
+    body.dark-ui .nav-item {
+        color: #777777;
+    }
+
+    body.dark-ui .nav-item.active,
+    body.dark-ui .nav-item:hover {
+        color: #ffffff;
+    }
+
+    /* ---- Header ---- */
+    .site-header {
+        height: 22vw;
+        padding: 4vw 5vw 0 5vw;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-left,
+    .header-right {
+        flex: 1;
+    }
+
+    .header-right {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .logo {
+        font-size: 8vw;
+        line-height: 0.95;
+    }
+
+    body.project-open .logo {
+        transform: scale(0.7) !important;
+    }
+
+    /* The white panel behind the logo must be tall enough for the scaled 2-line logo */
+    body.project-open .site-header {
+        height: 18vw !important;
+    }
+
+    .section-titles-wrap {
+        position: relative;
+        top: 9.5vw;
+        width: 100%;
+        text-align: right;
+    }
+
+    .scene-title-item {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: auto;
+        font-size: 5.5vw;
+        text-align: right;
+    }
+
+    /* ---- Navigation (bottom bar) ---- */
+    .site-nav {
+        position: fixed;
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        padding: 0;
+        background: #ffffff;
+        border: none;
+        z-index: 80;
+    }
+
+    .nav-item {
+        padding: 3.6vw 0;
+        font-size: 3.4vw;
+        text-align: center;
+    }
+
+    /* ---- Layout ---- */
+    .main-content {
+        padding-top: 18vw;
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    /* ---- About ---- */
+    #aboutSection {
+        display: block;
+        min-height: auto;
+        padding-bottom: 10vh;
+    }
+
+    .about-left {
+        justify-content: flex-start;
+    }
+
+    .portrait-sticky {
+        position: static;
+        width: 100%;
+        max-width: 280px;
+        margin-bottom: 8vw;
+    }
+
+    .intro-kicker { font-size: 3.8vw; }
+    .intro-text { font-size: 3.5vw; margin-bottom: 8vw; }
+    .about-block { font-size: 3.2vw; display: block; padding: 4vw 0; }
+    .about-label { margin-bottom: 2vw; font-size: 3.5vw; }
+    .about-entry { display: block; margin-bottom: 3vw; }
+    .about-entry span { display: block; text-align: left; margin-top: 1vw; }
+
+    /* ---- Selected Work (inverted, full-bleed) ---- */
+    #worksSection {
+        background-color: #000000;
+        color: #ffffff;
+        margin-left: -5vw;
+        margin-right: -5vw;
+        padding: 15vw 5vw 5vw;
+    }
+
+    #worksSection .project-category,
+    #worksSection .project-year {
+        color: #aaaaaa;
+    }
+
+    .works-layout {
+        display: block;
+    }
+
+    .works-media-sticky {
+        display: none;
+    }
+
+    .row-media {
+        display: block;
+        height: auto;
+        margin-bottom: 3vw;
+    }
+
+    .row-media img,
+    .row-media video {
+        height: auto;
+        max-height: 60vh;
+        object-position: left center;
+    }
+
+    .project-row {
+        min-height: auto;
+        display: block;
+        padding-bottom: 18vw;
+    }
+
+    .project-title { font-size: 8vw; line-height: 0.95; }
+    .project-meta { font-size: 3.5vw; margin-top: 2vw; }
+
+    /* ---- Archive ---- */
+    #archivesSection {
+        padding-top: 15vw;
+    }
+
+    .archive-grid {
+        grid-template-columns: 1fr;
+        row-gap: 12vw;
+    }
+
+    .archive-title,
+    .archive-meta {
+        font-size: 4.8vw;
+    }
+
+    .archive-info {
+        margin-top: 3vw;
+        margin-bottom: 3vw;
+    }
+
+    /* ---- Project page ---- */
+    .project-page {
+        padding: 24vw 5vw 16vw 5vw;
+    }
+
+    .modal-info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 5vw;
+        padding-top: 5vw;
+        padding-bottom: 6vw;
+    }
+
+    .modal-col-left {
+        gap: 3vw;
+    }
+
+    .meta-label { min-width: 25vw; font-size: 3.6vw; }
+    .meta-value { font-size: 3.6vw; }
+    .modal-title { font-size: 8vw; }
+    .modal-description { font-size: 4.5vw; line-height: 1.3; }
+
+    .modal-gallery-media {
+        display: flex;
+        flex-direction: column;
+        gap: 5vw;
+    }
+
+    .modal-pagination { font-size: 3.8vw; }
+
+    /* ---- Contact ---- */
+    .contact-inner {
+        gap: 4vw;
+        padding: 0 5vw;
+    }
+
+    .contact-inner a {
+        font-size: 4vw;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+    <div class="header-left">
+        <a href="#aboutSection" class="logo">HuyDuong's<br>Portfolio</a>
+    </div>
+
+    <div class="header-right">
+        <!-- CROSSFADING SECTION TITLES -->
+        <div class="section-titles-wrap">
+            <h1 class="scene-title-item" id="titleAbout">About</h1>
+            <h1 class="scene-title-item" id="titleWorks">Selected Work</h1>
+            <h1 class="scene-title-item" id="titleArchives">Archive</h1>
+            <h1 class="scene-title-item" id="titleContact">Contact</h1>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="site-nav" id="siteNav" aria-label="Section navigation">
+            <button type="button" class="nav-item active" data-target="aboutSection">About</button>
+            <button type="button" class="nav-item" data-target="worksSection">Work</button>
+            <button type="button" class="nav-item" data-target="archivesSection">Archive</button>
+            <button type="button" class="nav-item" data-target="contactSection">Contact</button>
+        </nav>
+    </div>
+</header>
+
+<!-- MAIN NATURAL SCROLL CONTENT -->
+<main class="main-content">
+
+    <!-- 1. ABOUT SECTION -->
+    <section id="aboutSection">
+        <div class="about-left">
+            <div class="portrait-sticky">
+                <img class="portrait" src="portrait.png" alt="Portrait of HuyDuong" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'">
+            </div>
+        </div>
+
+        <div class="about-right">
+            <p class="intro-kicker">Identity. Editorial. Typography. Digital.</p>
+            <p class="intro-text">HuyDuong is a multidisciplinary designer based in Ho Chi Minh City, Vietnam, working across the boundaries of each.</p>
+
+            <!-- EDUCATION -->
+            <div class="about-block">
+                <div class="about-label">Education</div>
+                <div class="about-content">
+                    <div class="about-entry">
+                        <strong>RMIT Vietnam University<br>
+                            <span class="entry-role">Bachelor of Design Studies</span>
+                        </strong>
+                        <span>Nov 2023 - Now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPERIENCES -->
+            <div class="about-block">
+                <div class="about-label">Professional Experiences</div>
+                <div class="about-content">
+                    <div class="about-entry">
+                        <strong>RMIT Sustainability Week<br>
+                            <span class="entry-role">Graphic Designer</span>
+                        </strong>
+                        <span>Aug 2025 - Nov 2025</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Flux Collective<br>
+                            <span class="entry-role">Director | Graphic & Motion Designer</span>
+                        </strong>
+                        <span>Mar 2025 - Now</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Dragon Capital | Project Pitching<br>
+                            <span class="entry-role">Brand Identity Designer</span>
+                        </strong>
+                        <span>May 2025</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>RMIT Flag Football Club<br>
+                            <span class="entry-role">Design Leader</span>
+                        </strong>
+                        <span>Nov 2024 - Sep 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SKILLS -->
+            <div class="about-block">
+                <div class="about-label">Skills</div>
+                <div class="about-content">
+                    <div class="about-entry">
+                        <strong>Software</strong>
+                        <span>InDesign, Illustrator, Photoshop, After Effects, TouchDesigner, Resolume Arena, Blender</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Creative Skillsets</strong>
+                        <span>Editorial & Print Production, Branding & Identity, Motion & Interactive Graphics, UX Design</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOWCASE -->
+            <div class="about-block">
+                <div class="about-label">Showcase</div>
+                <div class="about-content">
+                    <div class="about-entry">
+                        <strong>Ta nhớ gì về: Mùa hè bất tận</strong>
+                        <span>Publication</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Impact Showcase 2024 | RMIT Vietnam</strong>
+                        <span>Publication</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Coffee Table Book 2024 | RMIT Vietnam</strong>
+                        <span>Publication</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Bangkok Design Week 2026</strong>
+                        <span>Projection Mapping</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>IMMERSIO 2026</strong>
+                        <span>Projection Mapping</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>RMIT LIGHT NIGHT 2025 | RMIT Vietnam</strong>
+                        <span>VJ, Projection Mapping</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>Beyond2D 2024 | RMIT Vietnam</strong>
+                        <span>Best Motion Graphics & 3D Posters</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AWARDS -->
+            <div class="about-block">
+                <div class="about-label">Awards</div>
+                <div class="about-content">
+                    <div class="about-entry">
+                        <strong>VJ:MAZED 2025<br>
+                            <span class="entry-role">Champion</span>
+                        </strong>
+                        <span>VJ Contest</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>The Best Brand Awards 2025<br>
+                            <span class="entry-role">Asia Oceania Silver</span>
+                        </strong>
+                        <span>Identity Category</span>
+                    </div>
+                    <div class="about-entry">
+                        <strong>TERANG 2026<br>
+                            <span class="entry-role">Top 4 & Best Audio Design</span>
+                        </strong>
+                        <span>Projection Mapping</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 2. WORKS SECTION -->
+    <section id="worksSection">
+
+        <div class="works-layout">
+
+            <!-- STICKY, CROSSFADING MEDIA COLUMN (desktop only) -->
+            <div class="works-media-sticky" id="worksMediaSticky">
+
+                <div class="works-media-item active" data-media-index="0">
+                    <img src="Dấu ấn/scan.jpeg" alt="Dấu Ấn / Imprint" loading="lazy">
+                </div>
+
+                <div class="works-media-item" data-media-index="1">
+                    <img src="VAC/truck.jpeg" alt="Vietnam Access Conference" loading="lazy">
+                </div>
+
+                <div class="works-media-item" data-media-index="2">
+                    <img src="RMIT sus week/white.png" alt="RMIT Sustainability Week" loading="lazy">
+                </div>
+
+                <div class="works-media-item" data-media-index="3">
+                    <img src="UPMB/spreads.jpeg" alt="Under Phu My Bridge" loading="lazy">
+                </div>
+
+            </div>
+
+            <!-- SCROLLING TITLES -->
+            <div class="works-titles">
+
+                <!-- WORK 1 (Dau An) -->
+                <div class="project-row"
+                     id="projectDauAn"
+                     data-title="Dấu Ấn / Imprint"
+                     data-team="Huy Duong — Creative Lead & Graphic Designer; Thu Tang — Spatial Designer; Diem Nguyen — Spatial Designer; Tram Phan — Spatial Designer"
+                     data-mentor="Dr. Rachel Jahja — RMIT Vietnam"
+                     data-client="Vietnamese National Archives Center II"
+                     data-year="2026"
+                     data-hero-pos="50% 67%"
+                     data-images="Dấu ấn/Poster_mockup_2.jpeg, Dấu ấn/logo.mp4, Dấu ấn/icon set.jpeg, Dấu ấn/card_white.jpeg, Dấu ấn/instagram_post.jpeg, Dấu ấn/card_black.jpeg, Dấu ấn/IMG_1023.jpeg, Dấu ấn/scan.jpeg, Dấu ấn/lanyard_mockuppng.jpeg, Dấu ấn/tote_2.jpeg, Dấu ấn/1789536053571_997870785678993303_g8894158854267315744_3ead9cb3702b129e7ed3f409c507e90b.jpg, Dấu ấn/1789536064869_7332661170391651468_g8894158854267315744_f6b9b7d47e2caf68d7cad997e64b8484.jpg, Dấu ấn/1789536115680_7332661170391651468_g8894158854267315744_d41ec7dd4d94a0dd2c1416eca1bc530a.jpg"
+                     data-description="**Brief:** Develop an exhibition identity for the National Archives II, creating a contemporary way to engage younger audiences with Southern Vietnam’s archival history and heritage.
+
+**Approach:** The identity is built around the idea that each fragment holds a piece of memory. Inspired by layers, folds, stamps and catalogue marks found in archival materials, each fragment represents a partial record that gradually reveals a larger story.
+
+**Outcome:** The visual system extends across brand identity, exhibition graphics, wayfinding, editorial and digital experiences, creating a flexible framework for the exhibition journey.
+
+**Result:** The project received positive feedback from invited guests and reviewers, with the concept and visual system noted for its distinctive approach to archival storytelling.">
+                    <div class="row-media">
+                        <img src="Dấu ấn/scan.jpeg" alt="Dấu Ấn / Imprint" loading="lazy">
+                    </div>
+                    <div class="row-info">
+                        <div class="project-title">Dấu Ấn / Imprint</div>
+                        <div class="project-meta">
+                            <span class="project-category">Exhibition, Identity, Digital</span>
+                            <span class="project-year">2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORK 2 (VAC) -->
+                <div class="project-row"
+                     id="projectVAC"
+                     data-title="Vietnam Access Conference"
+                     data-role="Concept, Creative Direction & Design"
+                     data-mentor="Dr. Abbas Mteirek — RMIT Vietnam"
+                     data-client="Dragon Capital"
+                     data-award="The Best Brand Awards 2025 — Asia Oceania Silver"
+                     data-year="2025"
+                     data-images="VAC/truck.jpeg, VAC/emblem.png, VAC/brand.png, VAC/word.png, VAC/1.mp4, VAC/bus shelter.jpeg, VAC/name card.png, VAC/Billboard.jpeg, VAC/train.jpeg, VAC/tote.jpeg"
+                     data-description="**Brief:** Develop a visual identity for the Vietnam Access Conference, a platform connecting investors from all over the world with Vietnam’s growing market and emerging opportunities.
+
+**Approach:** The identity is built around the idea of unlocking Vietnam’s potential, using a layered mountain form inspired by the Hoàng Liên Sơn range. Rising peaks represent growth and opportunity, while the grounded base reflects stability, expertise and connection to Vietnam.
+
+**Outcome**: The visual system extends across brand identity, digital experiences and physical applications, creating a professional yet approachable presence for an international investment audience.
+
+**Result:** The identity received an Asia Oceania Silver Award at The Best Brand Awards 2025 and was pitched to the client team at Dragon Capital as a proposed identity direction. The concept was not selected for implementation.">
+                    <div class="row-media">
+                        <img src="VAC/truck.jpeg" alt="Vietnam Access Conference" loading="lazy">
+                    </div>
+                    <div class="row-info">
+                        <div class="project-title">Vietnam Access Conference</div>
+                        <div class="project-meta">
+                            <span class="project-category">Campaign, Identity, Digital</span>
+                            <span class="project-year">2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORK 3 (RSW) -->
+                <div class="project-row"
+                     id="projectRSW"
+                     data-title="RMIT Sustainability Week 2025"
+                     data-team="Huy Duong — Art Director & Graphic Designer; Phu Nguyen — Design Supervisor & Lead Designer; An Huynh — Content Strategist; Ngoc Nguyen — Copy Writer"
+                     data-year="2025"
+                     data-images="RMIT sus week/Facebook Image.jpg, RMIT sus week/Sustainability Wee 2025_RMIT 360.png, RMIT sus week/Antony 72.jpg, RMIT sus week/SW25 Activity Poster Post 2-03.png, RMIT sus week/IMG_6774.jpeg"
+                     data-description="**Brief:** Create a visual identity for RMIT Sustainability Week 2025 that encourages the RMIT community to take part in sustainability through small, collective actions. The identity should communicate how individual actions can build into a larger ripple of change.
+
+**Approach:** Built around “Ignite a Spark”, the identity explores how one small action can connect to another and create a ripple effect across the community. Energetic lines, sparks and expanding forms translate this idea into an active and expressive visual system.
+
+**Outcome:** The system was extended across creative direction, graphic design and event communications, creating an energetic identity that encourages participation and makes sustainability feel visible, accessible and achievable.
+
+**Result:** The visual identity was implemented across RMIT Sustainability Week 2025, spanning campaign and event communications.">
+                    <div class="row-media">
+                        <img src="RMIT sus week/white.png" alt="RMIT Sustainability Week" loading="lazy">
+                    </div>
+                    <div class="row-info">
+                        <div class="project-title">RMIT Sustainability Week 2025</div>
+                        <div class="project-meta">
+                            <span class="project-category">Campaign, Graphic, Digital</span>
+                            <span class="project-year">2025</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORK 4 (UPMB) -->
+                <div class="project-row"
+                     id="projectUPMB"
+                     data-title="Under Phu My Bridge"
+                     data-role="Research, Photography, Concept Development & Publication Design"
+                     data-mentor="Chiat Teoh — RMIT Vietnam"
+                     data-year="2024"
+                     data-images="UPMB/UPMB-img26.jpg, UPMB/spreads_2.jpeg, UPMB/UPMB-img8.jpg, UPMB/UPMB-img13.jpg, UPMB/UPMB-img10.jpg"
+                     data-description="**Brief:** Create a physical and digital A4 coffee table book introducing a chosen neighbourhood through its most distinctive characteristics.
+
+**Approach:** Under Phu My Bridge documents life and the environment beneath Phu My Bridge in Vietnam. Framed as a journey into the “underworld” beneath the bridge, the project reveals the realities, resilience, and hidden stories of the neighbourhood and its residents.
+
+**Outcome:** The research was developed into a printed editorial publication, structured as a journey from the physical environment into the lives of its inhabitants. The final book brings these observations together as a visual record of a place often overlooked.
+
+**Result:** The project was selected for the RMIT Impact Showcase and featured in the Coffee Table Book 2024.">
+                    <div class="row-media">
+                        <img src="UPMB/spreads.jpeg" alt="Under Phu My Bridge" loading="lazy">
+                    </div>
+                    <div class="row-info">
+                        <div class="project-title">Under Phu My Bridge</div>
+                        <div class="project-meta">
+                            <span class="project-category">Editorial, Photography, Printed</span>
+                            <span class="project-year">2024</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 3. ARCHIVES SECTION -->
+    <section id="archivesSection">
+        <div class="archive-grid">
+
+            <!-- Dau An -->
+            <div class="archive-item" data-target-id="projectDauAn">
+                <div class="archive-media">
+                    <video autoplay muted loop playsinline webkit-playsinline>
+                        <source src="motion_2.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Dấu Ấn / Imprint</div>
+                    <div class="archive-meta">Exhibition, Identity, Print — 2026</div>
+                </div>
+            </div>
+
+            <!-- XNĐ -->
+            <div class="archive-item"
+                 data-title="Xóm Nước Đen"
+                 data-year="2026"
+                 data-mentor="Dr. Andrew Stiff — RMIT Vietnam"
+                 data-role="Research, Concept Development, World Building & Publication Design"
+                 data-category="Speculative Design, Editorial, Publication"
+                 data-images="Xóm Nước Đen/z7834517978591_d148059fd22075defaeb321ff7ee5612.png, Xóm Nước Đen/IMG_8531.png, Xóm Nước Đen/IMG_8644.png, Xóm Nước Đen/IMG_8687.png, Xóm Nước Đen/2051 Map.jpeg, Xóm Nước Đen/ofm 2026-05-20 145858E6EAECC1F1EA.JPG, Xóm Nước Đen/map2.jpeg"
+                 data-description="**Brief:**
+Develop a speculative world-building project imagining how a chosen neighbourhood and community might evolve by 2051. The project should explore new systems, forms of community and everyday adaptations that respond to future environmental conditions.
+
+**Solution:**
+The project imagines Xóm Nước Đen, a flood-adapted neighbourhood in Southern Vietnam shaped by changing water levels, environmental conditions and everyday survival. Instead of proposing a single solution, the world develops through interconnected systems and behaviours, from navigation and barter systems to a living biofilm roof that adapts to the household beneath it.
+
+**Outcome:**
+The final outcome takes the form of a survival handbook from within the neighbourhood, supported by an environment drawing and speculative gigamap. Together, these artefacts document the community, its systems and its adaptations, presenting the world as an evolving place rather than a fixed design solution.
+
+**Result:** The project was selected for inclusion in the Capstone Show 2026, presenting the world-building project as part of the final student exhibition.">
+                <div class="archive-media">
+                    <img src="Xóm Nước Đen/IMG_8687.png" alt="Xóm Nước Đen" loading="lazy">
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Xóm Nước Đen</div>
+                    <div class="archive-meta">World Building, Editorial, Print — 2026</div>
+                </div>
+            </div>
+
+            <!-- No Reset -->
+            <div class="archive-item"
+                 data-title="No Reset"
+                 data-year="2026"
+                 data-role="Research, Concept Development & Publication Design"
+                 data-mentor="Giang Nguyen — RMIT Vietnam"
+                 data-category="Interaction"
+                 data-images="No Reset/IMG_6883.jpeg, No Reset/Full.jpg, No Reset/20260127_044649997_iOS.jpg, No Reset/20260127_044339910_iOS.jpg, No Reset/IMG_6875.jpeg, No Reset/20260127_044006395_iOS.jpg, No Reset/20260127_043345815_iOS.jpg"
+                 data-description="**Brief:**
+Develop a typographic visual storytelling piece inspired by Invisible Cities, connecting its themes to a chosen neighbourhood in Saigon or Hanoi through text, texture and the visual form of type.
+
+**Solution:**
+The project draws from the changing layers of everyday life in Cư Xá Thanh Đa, where spaces are continuously extended, patched and adapted by their inhabitants. This idea of accumulation is translated into a calendar, with each month adding another layer of typography, shape and texture without completely erasing what came before.
+
+**Outcome:**
+The final outcome is a physical calendar installation that gradually transforms from a clean and ordered system into a dense, fragmented composition. The passage of a year becomes a record of accumulated traces, where time moves forward, but nothing resets.
+
+**Result:** The project was selected for an external exhibition, where the calendar was presented as a physical installation beyond its original university submission.">
+                <div class="archive-media">
+                    <img src="No Reset/IMG_8810.jpg" alt="No Reset" loading="lazy">
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">No Reset</div>
+                    <div class="archive-meta">Typography, Print, Installation — 2026</div>
+                </div>
+            </div>
+
+            <!-- RSW -->
+            <div class="archive-item" data-target-id="projectRSW">
+                <div class="archive-media">
+                    <img src="RMIT sus week/white.png" alt="RMIT Sustainability Week 2025" loading="lazy">
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">RMIT Sustainability Week 2025</div>
+                    <div class="archive-meta">Campaign, Graphic, Digital — 2025</div>
+                </div>
+            </div>
+
+            <!-- VAC -->
+            <div class="archive-item" data-target-id="projectVAC">
+                <div class="archive-media">
+                    <img src="VAC/bus shelter.jpeg" alt="Vietnam Access Conference" loading="lazy">
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Vietnam Access Conference</div>
+                    <div class="archive-meta">Campaign, Identity, Digital — 2025</div>
+                </div>
+            </div>
+
+            <!-- UPMB -->
+            <div class="archive-item" data-target-id="projectUPMB">
+                <div class="archive-media">
+                    <img src="UPMB/cover.jpeg" alt="Under Phu My Bridge" loading="lazy">
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Under Phu My Bridge</div>
+                    <div class="archive-meta">Editorial, Photography, Print — 2024</div>
+                </div>
+            </div>
+
+            <!-- Thuong Nguon -->
+            <div class="archive-item"
+                 data-title="Thượng Nguồn (Upstream)"
+                 data-year="2025"
+                 data-category="Projection Mapping, Audiovisual"
+                 data-award="TERANG 2026 — Top 4 & Best Audio Design"
+                 data-video="none"
+                 data-team="Huy Duong — Concept Development, Graphic & 2D Motion; Dang Pham — Concept Development, 3D & Motion; Hieu Nguyen — 3D & Motion; Dung Bui — Audio Design"
+                 data-images="Flux/TN/UPSTREAM_1.png, Flux/TN/Terang_breakdown.png, Flux/TN/Terang_split view 1_1.mp4, Flux/TN/Terang_sample 1.mp4, Flux/TN/motion_graphic.mp4"
+                 data-description="**Brief:** Develop a projection mapping performance exploring the idea of exchange through the culture of Vietnam, using a cultural practice as the starting point for visual and conceptual development.
+
+**Solution:** The project focuses on the culture of Southern Vietnam’s floating markets, using water and current as a metaphor for how exchange moves through time. The visual narrative follows this current from floating markets and waterways into streets, structures and modern spaces, before eventually returning to its source.
+
+**Outcome:** The final work was presented as a projection mapping performance, combining graphic design, 2D and 3D motion, sound and spatial projection to create an audiovisual journey around movement, memory and exchange.">
+                <div class="archive-media">
+                    <video autoplay muted loop playsinline webkit-playsinline>
+                        <source src="Flux/TN/Terang_sample 1.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Thượng Nguồn (Upstream)</div>
+                    <div class="archive-meta">Projection Mapping, Audiovisual — 2026</div>
+                </div>
+            </div>
+
+            <!-- Som Mai -->
+            <div class="archive-item" 
+                 data-title="Sớm Mai" 
+                 data-year="2026" 
+                 data-category="Projection Mapping, Audiovisual" 
+                 data-video="none"
+                 data-team="Huy Duong — Concept Development, 2D & Audio Design; Dang Pham — 3D & Motion Design"
+                 data-images="Flux/Awake/Awake_1.png, Flux/Awake/awake split view_2.mp4"
+                 data-description="**Brief:**
+Create a 30–45 second projection mapping work responding to the theme “Childhood Dreams” for Awake Light Festival 2026. The work should evoke childhood memories and imagination while incorporating elements of local culture, nature and everyday life, and be designed to loop continuously in a public space.
+
+**Approach:**
+Inspired by the landscapes and culture of the Ê Đê people, the work imagines dawn unfolding inside a traditional longhouse through the eyes of a child resting on their mother’s back. The narrative moves from the quiet emergence of the Central Highlands landscape into the warmth and movement of midday, capturing childhood through a gentle, dreamlike perspective.
+
+**Outcome:** 
+The concept was translated into a projection mapping animation designed to loop seamlessly, combining moving imagery, environmental storytelling and architectural mapping to transform the building into a quiet scene from a child’s world.
+
+**Result:** The work was selected for AWAKE LIGHT FESTIVAL 2026 in Đắk Lắk and presented as part of the festival’s official projection mapping programme, alongside the Selected Artists Studio Exhibition.">
+                <div class="archive-media">
+                    <video autoplay muted loop playsinline webkit-playsinline>
+                        <source src="Flux/Awake/awake split view.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Sớm Mai</div>
+                    <div class="archive-meta">Projection Mapping, Audiovisual — 2026</div>
+                </div>
+            </div>
+
+            <!-- MKOMK -->
+            <div class="archive-item"
+                 data-title="Mắc Kẹt ở Market"
+                 data-year="2025"
+                 data-category="Graphic, Motion, VJ"
+                 data-video="none"
+                 data-team="Huy Duong — Concept Development & Graphic Design; Dang Pham — Concept Development, 3D & VJ; Hieu Nguyen — 3D & VJ"
+                 data-images="Flux/MKOMK/VJ_Mazed 1.jpg, Flux/MKOMK/Flycam 1.mp4, Flux/MKOMK/Track Cam 2.mp4, Flux/MKOMK/Market walk 1.mp4, Flux/MKOMK/Market Flycam 3.mp4, Flux/MKOMK/Glitching Kiosks 3.mp4, Flux/MKOMK/Glitching Kiosks.mp4"
+                 data-description="**Brief:**
+Create a 6-minute VJ performance responding to the theme “The City BREATHES”, translating the rhythm of Ho Chi Minh City into an immersive visual experience. The performance was developed for a paired two-screen competition using a shared music track.
+
+**Approach:**
+The project explores the similarities between the Vietnamese traditional market and the modern city, where noise, movement and exchange create an unpredictable rhythm. The city becomes a marketplace, with people constantly navigating, connecting and searching for opportunities.
+
+**Outcome:** The concept was translated into a live audiovisual performance, combining graphic design, 2D and 3D motion and generative visuals to create a constantly shifting environment inspired by the movement and unruly rhythms of the city.
+
+**Result:** The project won the VJ:MAZED competition at City Tết Fest and was later exhibited at Bangkok Design Week 2026.">
+                <div class="archive-media">
+                    <video autoplay muted loop playsinline webkit-playsinline>
+                        <source src="Flux/MKOMK/Glitching Kiosks 3.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="archive-info">
+                    <div class="archive-title">Mắc Kẹt ở Market</div>
+                    <div class="archive-meta">Graphic, Motion, VJ — 2025</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- 4. CONTACT SECTION -->
+    <section id="contactSection" class="contact-section">
+        <div class="contact-inner">
+            <a href="mailto:912duonghuy@gmail.com">912duonghuy@gmail.com</a>
+            <a href="tel:+84906912005">(+84) 906912005</a>
+            <a href="https://www.instagram.com/huyduong.indd" target="_blank" rel="noopener">@huyduong.indd</a>
+            <a href="https://www.linkedin.com/in/duc-huy-duong-5b7637362" target="_blank" rel="noopener">www.linkedin.com/in/duc-huy-duong-5b7637362</a>
+        </div>
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     DEDICATED FULL-PAGE PROJECT VIEW
+========================================================= -->
+<div class="project-page" id="projectPage">
+    <div class="project-page-inner">
+
+        <!-- TOP: HERO MEDIA -->
+        <div class="modal-hero-media" id="modalHeroMedia"></div>
+
+        <!-- 2-COLUMN BRIEF (50% / 50%) -->
+        <div class="modal-info-grid">
+
+            <!-- LEFT: TITLE & METADATA -->
+            <div class="modal-col-left">
+                <div class="modal-title-wrap">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                </div>
+
+                <div class="modal-meta-wrap">
+                    <div class="meta-row" id="rowRole">
+                        <span class="meta-label">Role</span>
+                        <span class="meta-value" id="modalRole"></span>
+                    </div>
+                    <div class="meta-row" id="rowTeam">
+                        <span class="meta-label">Team</span>
+                        <div class="meta-value meta-team-list" id="modalTeam"></div>
+                    </div>
+                    <div class="meta-row" id="rowMentor">
+                        <span class="meta-label">Mentor</span>
+                        <span class="meta-value" id="modalMentor"></span>
+                    </div>
+                    <div class="meta-row" id="rowClient">
+                        <span class="meta-label">Client</span>
+                        <span class="meta-value" id="modalClient"></span>
+                    </div>
+                    <div class="meta-row" id="rowYear">
+                        <span class="meta-label">Year</span>
+                        <span class="meta-value" id="modalYear"></span>
+                    </div>
+                    <div class="meta-row" id="rowAward">
+                        <span class="meta-label">Award</span>
+                        <span class="meta-value" id="modalAward"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: DESCRIPTION -->
+            <div class="modal-col-right">
+                <p class="modal-description" id="modalDescription"></p>
+            </div>
+        </div>
+
+        <!-- BOTTOM: ADDITIONAL CASE STUDY MEDIA -->
+        <div class="modal-gallery-media" id="modalGalleryMedia"></div>
+
+        <!-- FOOTER / PAGINATION -->
+        <div class="modal-pagination">
+            <button type="button" class="modal-nav-btn" id="modalPrev">← Previous Project</button>
+            <span class="back-to-work-btn" id="backToWorkBtn">← Back to Index</span>
+            <button type="button" class="modal-nav-btn" id="modalNext">Next Project →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ========================================
+   CACHED ELEMENTS
+======================================== */
+const siteHeader = document.querySelector(".site-header");
+
+const aboutSection = document.getElementById("aboutSection");
+const worksSection = document.getElementById("worksSection");
+const archivesSection = document.getElementById("archivesSection");
+const contactSection = document.getElementById("contactSection");
+
+const titleAbout = document.getElementById("titleAbout");
+const titleWorks = document.getElementById("titleWorks");
+const titleArchives = document.getElementById("titleArchives");
+const titleContact = document.getElementById("titleContact");
+
+const navItems = [...document.querySelectorAll(".nav-item")];
+
+const projectPage = document.getElementById("projectPage");
+const modalHeroMedia = document.getElementById("modalHeroMedia");
+const modalGalleryMedia = document.getElementById("modalGalleryMedia");
+const modalTitle = document.getElementById("modalTitle");
+const modalDescription = document.getElementById("modalDescription");
+const modalYear = document.getElementById("modalYear");
+const modalTeam = document.getElementById("modalTeam");
+const modalPrev = document.getElementById("modalPrev");
+const modalNext = document.getElementById("modalNext");
+const backToWorkBtn = document.getElementById("backToWorkBtn");
+
+// Metadata rows: [row, value element]
+const rowRole = document.getElementById("rowRole");
+const rowTeam = document.getElementById("rowTeam");
+const rowMentor = document.getElementById("rowMentor");
+const rowClient = document.getElementById("rowClient");
+const rowAward = document.getElementById("rowAward");
+const modalRole = document.getElementById("modalRole");
+const modalMentor = document.getElementById("modalMentor");
+const modalClient = document.getElementById("modalClient");
+const modalAward = document.getElementById("modalAward");
+
+const allClickableItems = [...document.querySelectorAll(".project-row, .archive-item")];
+
+let projectList = [];
+let projectIndex = 0;
+let previousTriggerEl = null;
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+
+/* =========================================================
+   CROSSFADING SECTION TITLES, NAV STATE & MOBILE DARK UI
+========================================================= */
+function updateHeaderTitles() {
+    if (document.body.classList.contains("project-open")) {
+        setTitleOpacity(0, 0, 0, 0);
+        return;
+    }
+
+    const triggerOffset = 300;
+    const fadeDistance = 60;
+
+    const worksPos = worksSection.getBoundingClientRect().top - triggerOffset;
+    const archivesPos = archivesSection.getBoundingClientRect().top - triggerOffset;
+    const contactPos = contactSection ? (contactSection.getBoundingClientRect().top - triggerOffset) : Infinity;
+
+    if (worksPos > fadeDistance) {
+        setTitleOpacity(1, 0, 0, 0);
+        updateNavActive("aboutSection");
+    } else if (worksPos > -fadeDistance) {
+        const t = clamp((fadeDistance - worksPos) / (fadeDistance * 2), 0, 1);
+        setTitleOpacity(1 - t, t, 0, 0);
+        updateNavActive(t > 0.5 ? "worksSection" : "aboutSection");
+    } else if (archivesPos > fadeDistance) {
+        setTitleOpacity(0, 1, 0, 0);
+        updateNavActive("worksSection");
+    } else if (archivesPos > -fadeDistance) {
+        const t = clamp((fadeDistance - archivesPos) / (fadeDistance * 2), 0, 1);
+        setTitleOpacity(0, 1 - t, t, 0);
+        updateNavActive(t > 0.5 ? "archivesSection" : "worksSection");
+    } else if (contactPos > fadeDistance) {
+        setTitleOpacity(0, 0, 1, 0);
+        updateNavActive("archivesSection");
+    } else if (contactPos > -fadeDistance) {
+        const t = clamp((fadeDistance - contactPos) / (fadeDistance * 2), 0, 1);
+        setTitleOpacity(0, 0, 1 - t, t);
+        updateNavActive(t > 0.5 ? "contactSection" : "archivesSection");
+    } else {
+        setTitleOpacity(0, 0, 0, 1);
+        updateNavActive("contactSection");
+    }
+
+    updateDarkUI();
+}
+
+function setTitleOpacity(aboutOp, worksOp, archivesOp, contactOp) {
+    [
+        [titleAbout, aboutOp],
+        [titleWorks, worksOp],
+        [titleArchives, archivesOp],
+        [titleContact, contactOp]
+    ].forEach(([el, opacity]) => {
+        if (el) {
+            el.style.opacity = opacity;
+            el.style.visibility = opacity > 0.01 ? "visible" : "hidden";
+        }
+    });
+}
+
+function updateNavActive(targetId) {
+    navItems.forEach(item => {
+        item.classList.toggle("active", item.dataset.target === targetId);
+    });
+}
+
+// The dark UI (CSS only applies it on mobile) is on while the Work section covers the header
+function updateDarkUI() {
+    const headerBottom = siteHeader.offsetHeight;
+    const { top, bottom } = worksSection.getBoundingClientRect();
+    document.body.classList.toggle("dark-ui", top <= headerBottom && bottom > headerBottom);
+}
+
+
+/* =========================================================
+   NAVIGATION & SCROLL EVENTS
+========================================================= */
+document.querySelector(".logo")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeProjectPage();
+    aboutSection.scrollIntoView({ behavior: "smooth" });
+});
+
+navItems.forEach(item => {
+    item.addEventListener("click", () => {
+        closeProjectPage();
+        const targetEl = document.getElementById(item.dataset.target);
+        if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+    });
+});
+
+// Scroll handler throttled to one run per animation frame
+let isTicking = false;
+window.addEventListener("scroll", () => {
+    if (isTicking) return;
+    isTicking = true;
+    window.requestAnimationFrame(() => {
+        updateHeaderTitles();
+        isTicking = false;
+    });
+}, { passive: true });
+
+window.addEventListener("resize", updateHeaderTitles);
+window.addEventListener("load", updateHeaderTitles);
+
+
+/* =========================================================
+   PROJECT PAGE: DATA
+========================================================= */
+function getItemData(el) {
+    if (!el) return { title: "", description: "", images: [], videoSrc: null, year: "", role: "", client: "", award: "", team: "", mentor: "" };
+
+    const videoSource = el.querySelector(".row-media video source, .archive-media video source");
+    const videoEl = el.querySelector(".row-media video, .archive-media video");
+    const imgEl = el.querySelector("img");
+
+    // Images: comma-separated data-images, or a single data-image, or the card's own <img>
+    let images = [];
+    if (el.dataset.images) {
+        images = el.dataset.images.split(",").map(url => url.trim()).filter(Boolean);
+    } else if (el.dataset.image) {
+        images = [el.dataset.image.trim()];
+    } else if (imgEl && imgEl.src) {
+        images = [imgEl.src];
+    }
+
+    // Hero video: data-video="none" turns it off, data-video="file.mp4" overrides it,
+    // otherwise it falls back to the video shown on the card.
+    const videoOverride = (el.dataset.video || "").trim();
+    let videoSrc;
+    if (videoOverride === "none") {
+        videoSrc = null;
+    } else if (videoOverride) {
+        videoSrc = videoOverride;
+    } else {
+        videoSrc = videoSource ? videoSource.getAttribute("src") : (videoEl ? videoEl.getAttribute("src") : null);
+    }
+
+    return {
+        title: el.dataset.title || el.querySelector(".project-title, .archive-title")?.textContent.trim() || "",
+        description: el.dataset.description || "",
+        year: el.dataset.year || el.querySelector(".project-year, .archive-date")?.textContent.trim() || "",
+        role: el.dataset.role || "",
+        client: el.dataset.client || "",
+        award: el.dataset.award || el.dataset.awards || "",
+        team: el.dataset.team || "",
+        mentor: el.dataset.mentor || "",
+        images,
+        videoSrc,
+        heroRatio: el.dataset.heroRatio || null,
+        heroFit: el.dataset.heroFit || null,
+        heroPos: el.dataset.heroPos || null
+    };
+}
+
+
+/* =========================================================
+   PROJECT PAGE: RENDERING
+========================================================= */
+function setMetaRow(rowEl, valueEl, value) {
+    if (value && value.trim() !== "") {
+        valueEl.textContent = value;
+        rowEl.style.display = "flex";
+    } else {
+        rowEl.style.display = "none";
+    }
+}
+
+function renderTeam(team) {
+    if (!team || team.trim() === "") {
+        rowTeam.style.display = "none";
+        return;
+    }
+
+    // People are separated by ";" or a new line.
+    // Fallback: split on commas that are followed by "Name — Role".
+    const rawMembers = (team.includes(";") || team.includes("\n"))
+        ? team.split(/;|\n/)
+        : team.split(/,\s*(?=[^—\-:]+[—\-:])/);
+
+    modalTeam.innerHTML = rawMembers
+        .map(m => m.trim())
+        .filter(Boolean)
+        .map(m => {
+            const parts = m.split(/—|-|:/);
+            if (parts.length < 2) {
+                return `<div class="team-member"><span class="team-name">${m}</span></div>`;
+            }
+            const name = parts[0].trim();
+            const role = parts.slice(1).join("—").trim();
+            return `<div class="team-member"><span class="team-name">${name}</span><span class="team-role">${role}</span></div>`;
+        })
+        .join("");
+
+    rowTeam.style.display = "flex";
+}
+
+function createLoopVideo(src, className = "") {
+    const video = document.createElement("video");
+    if (className) video.className = className;
+    video.src = src;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute("webkit-playsinline", "");
+    return video;
+}
+
+function markOrientation(el, width, height) {
+    el.classList.add(width > height ? "is-landscape" : "is-portrait");
+}
+
+function renderHeroMedia(data) {
+    modalHeroMedia.innerHTML = "";
+
+    let hero = null;
+    if (data.videoSrc) {
+        hero = createLoopVideo(data.videoSrc, "modal-media-item modal-video");
+    } else if (data.images.length > 0) {
+        hero = document.createElement("img");
+        hero.className = "modal-media-item modal-image";
+        hero.src = data.images[0];
+        hero.alt = data.title;
+        hero.loading = "lazy";
+    }
+    if (!hero) return;
+
+    if (data.heroRatio) hero.style.aspectRatio = data.heroRatio;
+    if (data.heroFit) hero.style.objectFit = data.heroFit;
+    if (data.heroPos) hero.style.objectPosition = data.heroPos;
+    modalHeroMedia.appendChild(hero);
+}
+
+function renderGallery(data) {
+    modalGalleryMedia.innerHTML = "";
+
+    // The first image is already used as the hero, unless a video took that spot
+    const startIndex = (!data.videoSrc && data.images.length > 0) ? 1 : 0;
+
+    for (let i = startIndex; i < data.images.length; i++) {
+        const url = data.images[i];
+
+        if (/\.(mp4|webm)$/i.test(url)) {
+            const video = createLoopVideo(url);
+            video.onloadedmetadata = () => markOrientation(video, video.videoWidth, video.videoHeight);
+            modalGalleryMedia.appendChild(video);
+        } else {
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = `${data.title} - ${i + 1}`;
+            img.loading = "lazy";
+            img.onload = () => markOrientation(img, img.naturalWidth, img.naturalHeight);
+            modalGalleryMedia.appendChild(img);
+        }
+    }
+}
+
+function renderProjectPage() {
+    if (!projectList.length) return;
+    const data = getItemData(projectList[projectIndex]);
+
+    setMetaRow(rowRole, modalRole, data.role);
+    setMetaRow(rowMentor, modalMentor, data.mentor);
+    setMetaRow(rowClient, modalClient, data.client);
+    setMetaRow(rowAward, modalAward, data.award);
+    renderTeam(data.team);
+    modalYear.textContent = data.year;
+
+    modalTitle.textContent = data.title;
+    modalDescription.innerHTML = data.description
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .split(/\n\s*\n/)
+        .map(p => p.trim())
+        .filter(Boolean)
+        .map(p => `<p>${p}</p>`)
+        .join("");
+
+    renderHeroMedia(data);
+    renderGallery(data);
+
+    modalPrev.disabled = projectIndex === 0;
+    modalNext.disabled = projectIndex === projectList.length - 1;
+
+    projectPage.scrollTop = 0;
+}
+
+
+/* =========================================================
+   PROJECT PAGE: OPEN / CLOSE / NAVIGATE
+========================================================= */
+function openProjectPage(list, index, trigger) {
+    projectList = list;
+    projectIndex = index;
+    previousTriggerEl = trigger || null;
+
+    renderProjectPage();
+
+    projectPage.classList.add("active");
+    document.body.classList.add("project-open");
+    document.body.style.overflow = "hidden";
+
+    setTitleOpacity(0, 0, 0, 0);
+    history.pushState({ projectOpen: true }, "", "#project");
+}
+
+function closeProjectPage(popHistory = true) {
+    if (!projectPage.classList.contains("active")) return;
+
+    projectPage.classList.remove("active");
+    document.body.classList.remove("project-open");
+
+    modalHeroMedia.querySelectorAll("video").forEach(v => { v.pause(); v.src = ""; });
+    modalHeroMedia.innerHTML = "";
+    modalGalleryMedia.innerHTML = "";
+
+    document.body.style.overflow = "";
+    if (previousTriggerEl) previousTriggerEl.focus();
+
+    updateHeaderTitles();
+
+    if (popHistory && window.location.hash === "#project") {
+        history.back();
+    }
+}
+
+function stepProject(direction) {
+    const nextIndex = projectIndex + direction;
+    if (nextIndex < 0 || nextIndex >= projectList.length) return;
+    projectIndex = nextIndex;
+    renderProjectPage();
+}
+
+function handleKeydown(event) {
+    if (!projectPage.classList.contains("active")) return;
+    if (event.key === "Escape") closeProjectPage();
+    else if (event.key === "ArrowLeft") stepProject(-1);
+    else if (event.key === "ArrowRight") stepProject(1);
+}
+
+// Browser back button / swipe-back closes the project page
+window.addEventListener("popstate", () => {
+    if (projectPage.classList.contains("active")) closeProjectPage(false);
+});
+
+document.addEventListener("keydown", handleKeydown);
+
+allClickableItems.forEach((item, index) => {
+    item.addEventListener("click", () => {
+        // Archive cards can point at a full project row via data-target-id
+        const targetId = item.dataset.targetId;
+        if (targetId) {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const targetIndex = allClickableItems.indexOf(targetEl);
+                openProjectPage(allClickableItems, targetIndex !== -1 ? targetIndex : index, targetEl);
+                return;
+            }
+        }
+        openProjectPage(allClickableItems, index, item);
+    });
+});
+
+modalPrev.addEventListener("click", () => stepProject(-1));
+modalNext.addEventListener("click", () => stepProject(1));
+backToWorkBtn.addEventListener("click", () => closeProjectPage());
+
+
+/* =========================================================
+   SELECTED WORK: STICKY MEDIA CROSSFADE
+========================================================= */
+const worksMediaItems = [...document.querySelectorAll("#worksSection .works-media-item")];
+const worksProjectRows = [...document.querySelectorAll("#worksSection .project-row")];
+
+function setActiveWorksMedia(index) {
+    worksMediaItems.forEach((item, i) => {
+        item.classList.toggle("active", i === index);
+    });
+}
+
+// Whichever row crosses the middle band of the viewport decides which image is shown
+if (worksProjectRows.length && worksMediaItems.length && "IntersectionObserver" in window) {
+    const worksObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const index = worksProjectRows.indexOf(entry.target);
+            if (index !== -1) setActiveWorksMedia(index);
+        });
+    }, {
+        root: null,
+        rootMargin: "-45% 0px -45% 0px",
+        threshold: 0
+    });
+
+    worksProjectRows.forEach(row => worksObserver.observe(row));
+}
+
+// Hovering a title reveals the color of its sticky image
+worksProjectRows.forEach((row, index) => {
+    row.addEventListener("mouseenter", () => worksMediaItems[index]?.classList.add("hovered"));
+    row.addEventListener("mouseleave", () => worksMediaItems[index]?.classList.remove("hovered"));
+});
+
+// Clicking the sticky image opens the matching project
+worksMediaItems.forEach((media, index) => {
+    media.addEventListener("click", () => {
+        const row = worksProjectRows[index];
+        if (!row) return;
+        const fullIndex = allClickableItems.indexOf(row);
+        openProjectPage(allClickableItems, fullIndex !== -1 ? fullIndex : index, row);
+    });
+});
+
+
+/* =========================================================
+   SCROLL REVEAL (ease in as elements enter the viewport)
+========================================================= */
+if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Desktop: only the title block moves (the image column is sticky).
+    // Mobile: the whole row (image + title) reveals together.
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const rowSelector = isMobile ? ".project-row" : ".row-info";
+
+    const revealTargets = document.querySelectorAll(
+        `.intro-kicker, .intro-text, .about-block, ${rowSelector}, .archive-item, .contact-inner`
+    );
+
+    const revealObserver = new IntersectionObserver(entries => {
+        entries
+            .filter(entry => entry.isIntersecting)
+            .forEach((entry, i) => {
+                // Small stagger when several elements enter at the same time
+                entry.target.style.transitionDelay = `${i * 80}ms`;
+                entry.target.classList.add("is-visible");
+                revealObserver.unobserve(entry.target);
+            });
+    }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+
+    revealTargets.forEach(el => {
+        el.classList.add("reveal");
+        revealObserver.observe(el);
+    });
+}
+
+
+/* INITIAL RUN */
+updateHeaderTitles();
+
+</script>
+</body>
+</html>
