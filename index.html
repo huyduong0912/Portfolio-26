@@ -800,20 +800,26 @@ body.project-open .nav-item:hover {
 
 
 /* =========================================================
-   SCROLL REVEAL
+   CONTINUOUS SCROLL REVEAL (2-WAY EASE-IN)
 ========================================================= */
 
 .reveal {
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(24px);
     transition:
-        opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+/* Khi lướt lên, phần tử trượt nhẹ từ trên xuống để tạo cảm giác thuận chiều */
+.reveal.from-top {
+    transform: translateY(-24px);
 }
 
 .reveal.is-visible {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
 }
 
 
@@ -2110,11 +2116,9 @@ worksMediaItems.forEach((media, index) => {
 
 
 /* =========================================================
-   SCROLL REVEAL (ease in as elements enter the viewport)
+   CONTINUOUS SCROLL REVEAL (2-WAY EASE-IN KHI SCROLL UP/DOWN)
 ========================================================= */
 if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    // Desktop: only the title block moves (the image column is sticky).
-    // Mobile: the whole row (image + title) reveals together.
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const rowSelector = isMobile ? ".project-row" : ".row-info";
 
@@ -2122,16 +2126,39 @@ if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-mot
         `.intro-kicker, .intro-text, .about-block, ${rowSelector}, .archive-item, .contact-inner`
     );
 
+    // Theo dõi hướng cuộn của người dùng
+    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    let isScrollingUp = false;
+
+    window.addEventListener("scroll", () => {
+        const currentY = window.pageYOffset || document.documentElement.scrollTop;
+        isScrollingUp = currentY < lastScrollY;
+        lastScrollY = currentY;
+    }, { passive: true });
+
     const revealObserver = new IntersectionObserver(entries => {
-        entries
-            .filter(entry => entry.isIntersecting)
-            .forEach((entry, i) => {
-                // Small stagger when several elements enter at the same time
-                entry.target.style.transitionDelay = `${i * 80}ms`;
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                // Tùy theo hướng scroll mà điều chỉnh offset bắt đầu
+                if (isScrollingUp) {
+                    entry.target.classList.add("from-top");
+                } else {
+                    entry.target.classList.remove("from-top");
+                }
+
+                // Stagger nhẹ cho các mục xuất hiện đồng thời
+                entry.target.style.transitionDelay = `${(i % 5) * 60}ms`;
                 entry.target.classList.add("is-visible");
-                revealObserver.unobserve(entry.target);
-            });
-    }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+            } else {
+                // Khi phần tử ra khỏi màn hình: reset lại trạng thái để khi lướt ngược lại sẽ ease-in lại
+                entry.target.style.transitionDelay = "0ms";
+                entry.target.classList.remove("is-visible");
+            }
+        });
+    }, { 
+        threshold: 0.1, 
+        rootMargin: "-4% 0px -4% 0px" // Vùng an toàn để không bị nháy mép màn hình
+    });
 
     revealTargets.forEach(el => {
         el.classList.add("reveal");
