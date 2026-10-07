@@ -800,26 +800,20 @@ body.project-open .nav-item:hover {
 
 
 /* =========================================================
-   CONTINUOUS SCROLL REVEAL (2-WAY EASE-IN)
+   SCROLL REVEAL
 ========================================================= */
 
 .reveal {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(32px);
     transition:
-        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
-}
-
-/* Khi lướt lên, phần tử trượt nhẹ từ trên xuống để tạo cảm giác thuận chiều */
-.reveal.from-top {
-    transform: translateY(-24px);
+        opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.is-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
 }
 
 
@@ -890,7 +884,6 @@ body.project-open .nav-item:hover {
         transform: scale(0.7) !important;
     }
 
-    /* The white panel behind the logo must be tall enough for the scaled 2-line logo */
     body.project-open .site-header {
         height: 18vw !important;
     }
@@ -1304,7 +1297,7 @@ body.project-open .nav-item:hover {
                      data-client="Dragon Capital"
                      data-award="The Best Brand Awards 2025 — Asia Oceania Silver"
                      data-year="2025"
-                     data-images="VAC/truck.jpeg, VAC/emblem.png, VAC/brand.png, VAC/word.png, VAC/1.mp4, VAC/bus shelter.jpeg, VAC/name tag.jpeg, VAC/Billboard.jpeg, VAC/train.jpeg, VAC/tote.jpeg"
+                     data-images="VAC/truck.jpeg, VAC/emblem.png, VAC/brand.png, VAC/word.png, VAC/1.mp4, VAC/bus shelter.jpeg, VAC/name card.png, VAC/Billboard.jpeg, VAC/train.jpeg, VAC/tote.jpeg"
                      data-description="**Brief:** Develop a visual identity for the Vietnam Access Conference, a platform connecting investors from all over the world with Vietnam’s growing market and emerging opportunities.
 
 **Approach:** The identity is built around the idea of unlocking Vietnam’s potential, using a layered mountain form inspired by the Hoàng Liên Sơn range. Rising peaks represent growth and opportunity, while the grounded base reflects stability, expertise and connection to Vietnam.
@@ -1558,7 +1551,7 @@ The project explores the similarities between the Vietnamese traditional market 
 
 **Outcome:** The concept was translated into a live audiovisual performance, combining graphic design, 2D and 3D motion and generative visuals to create a constantly shifting environment inspired by the movement and unruly rhythms of the city.
 
-**Result:** The project won the VJ:MAZED competition at City Tết Fest and was later exhibited at Bangkok Design Week 2026, IMMERSIO 2026, and other exhibitions.">
+**Result:** The project won the VJ:MAZED competition at City Tết Fest and was later exhibited at Bangkok Design Week 2026.">
                 <div class="archive-media">
                     <video autoplay muted loop playsinline webkit-playsinline>
                         <source src="Flux/MKOMK/Glitching Kiosks 3.mp4" type="video/mp4">
@@ -1653,7 +1646,7 @@ The project explores the similarities between the Vietnamese traditional market 
 
 <script>
 /* ========================================
-   CACHED ELEMENTS
+   CACHED ELEMENTS & SECTION SETUP
 ======================================== */
 const siteHeader = document.querySelector(".site-header");
 
@@ -1680,21 +1673,43 @@ const modalPrev = document.getElementById("modalPrev");
 const modalNext = document.getElementById("modalNext");
 const backToWorkBtn = document.getElementById("backToWorkBtn");
 
-// Metadata rows: [row, value element]
+// Metadata rows
 const rowRole = document.getElementById("rowRole");
 const rowTeam = document.getElementById("rowTeam");
 const rowMentor = document.getElementById("rowMentor");
 const rowClient = document.getElementById("rowClient");
+const rowYear = document.getElementById("rowYear");
 const rowAward = document.getElementById("rowAward");
 const modalRole = document.getElementById("modalRole");
 const modalMentor = document.getElementById("modalMentor");
 const modalClient = document.getElementById("modalClient");
 const modalAward = document.getElementById("modalAward");
 
-const allClickableItems = [...document.querySelectorAll(".project-row, .archive-item")];
+/* =========================================================
+   PROJECT LISTS (WORK NỐI ARCHIVE KHÔNG TRÙNG LẶP)
+========================================================= */
+const worksMediaItems = [...document.querySelectorAll("#worksSection .works-media-item")];
+const worksProjectRows = [...document.querySelectorAll("#worksSection .project-row")];
 
-let projectList = [];
-let projectIndex = 0;
+// 1. Danh sách 9 bài Archive chuẩn (map target-id về element gốc để luôn có đủ data)
+const archiveCards = [...document.querySelectorAll("#archivesSection .archive-item")];
+const archiveProjectList = archiveCards.map(card => {
+    const targetId = card.dataset.targetId;
+    if (targetId) {
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) return targetEl;
+    }
+    return card;
+});
+
+// 2. Lọc các bài chỉ có ở Archive (loại bỏ 4 bài đã có ở Selected Work)
+const archiveOnlyProjects = archiveProjectList.filter(item => !worksProjectRows.includes(item));
+
+// 3. Danh sách cho Work: 4 bài của Work + nối tiếp các bài Archive còn lại (không trùng lặp)
+const worksProjectList = [...worksProjectRows, ...archiveOnlyProjects];
+
+let activeProjectList = [];
+let activeProjectIndex = 0;
 let previousTriggerEl = null;
 
 function clamp(value, min, max) {
@@ -1767,7 +1782,6 @@ function updateNavActive(targetId) {
     });
 }
 
-// The dark UI (CSS only applies it on mobile) is on while the Work section covers the header
 function updateDarkUI() {
     const headerBottom = siteHeader.offsetHeight;
     const { top, bottom } = worksSection.getBoundingClientRect();
@@ -1792,7 +1806,6 @@ navItems.forEach(item => {
     });
 });
 
-// Scroll handler throttled to one run per animation frame
 let isTicking = false;
 window.addEventListener("scroll", () => {
     if (isTicking) return;
@@ -1808,7 +1821,7 @@ window.addEventListener("load", updateHeaderTitles);
 
 
 /* =========================================================
-   PROJECT PAGE: DATA
+   PROJECT PAGE: DATA RETRIEVAL
 ========================================================= */
 function getItemData(el) {
     if (!el) return { title: "", description: "", images: [], videoSrc: null, year: "", role: "", client: "", award: "", team: "", mentor: "" };
@@ -1817,7 +1830,6 @@ function getItemData(el) {
     const videoEl = el.querySelector(".row-media video, .archive-media video");
     const imgEl = el.querySelector("img");
 
-    // Images: comma-separated data-images, or a single data-image, or the card's own <img>
     let images = [];
     if (el.dataset.images) {
         images = el.dataset.images.split(",").map(url => url.trim()).filter(Boolean);
@@ -1827,8 +1839,6 @@ function getItemData(el) {
         images = [imgEl.src];
     }
 
-    // Hero video: data-video="none" turns it off, data-video="file.mp4" overrides it,
-    // otherwise it falls back to the video shown on the card.
     const videoOverride = (el.dataset.video || "").trim();
     let videoSrc;
     if (videoOverride === "none") {
@@ -1875,8 +1885,6 @@ function renderTeam(team) {
         return;
     }
 
-    // People are separated by ";" or a new line.
-    // Fallback: split on commas that are followed by "Name — Role".
     const rawMembers = (team.includes(";") || team.includes("\n"))
         ? team.split(/;|\n/)
         : team.split(/,\s*(?=[^—\-:]+[—\-:])/);
@@ -1938,7 +1946,6 @@ function renderHeroMedia(data) {
 function renderGallery(data) {
     modalGalleryMedia.innerHTML = "";
 
-    // The first image is already used as the hero, unless a video took that spot
     const startIndex = (!data.videoSrc && data.images.length > 0) ? 1 : 0;
 
     for (let i = startIndex; i < data.images.length; i++) {
@@ -1960,30 +1967,33 @@ function renderGallery(data) {
 }
 
 function renderProjectPage() {
-    if (!projectList.length) return;
-    const data = getItemData(projectList[projectIndex]);
+    if (!activeProjectList.length) return;
+    const currentEl = activeProjectList[activeProjectIndex];
+    const data = getItemData(currentEl);
 
     setMetaRow(rowRole, modalRole, data.role);
     setMetaRow(rowMentor, modalMentor, data.mentor);
     setMetaRow(rowClient, modalClient, data.client);
     setMetaRow(rowAward, modalAward, data.award);
+    setMetaRow(rowYear, modalYear, data.year);
     renderTeam(data.team);
-    modalYear.textContent = data.year;
 
     modalTitle.textContent = data.title;
     modalDescription.innerHTML = data.description
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .split(/\n\s*\n/)
-        .map(p => p.trim())
-        .filter(Boolean)
-        .map(p => `<p>${p}</p>`)
-        .join("");
+        ? data.description
+            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+            .split(/\n\s*\n/)
+            .map(p => p.trim())
+            .filter(Boolean)
+            .map(p => `<p>${p}</p>`)
+            .join("")
+        : "";
 
     renderHeroMedia(data);
     renderGallery(data);
 
-    modalPrev.disabled = projectIndex === 0;
-    modalNext.disabled = projectIndex === projectList.length - 1;
+    modalPrev.disabled = activeProjectIndex === 0;
+    modalNext.disabled = activeProjectIndex === activeProjectList.length - 1;
 
     projectPage.scrollTop = 0;
 }
@@ -1993,8 +2003,9 @@ function renderProjectPage() {
    PROJECT PAGE: OPEN / CLOSE / NAVIGATE
 ========================================================= */
 function openProjectPage(list, index, trigger) {
-    projectList = list;
-    projectIndex = index;
+    if (index < 0 || index >= list.length) return;
+    activeProjectList = list;
+    activeProjectIndex = index;
     previousTriggerEl = trigger || null;
 
     renderProjectPage();
@@ -2028,9 +2039,9 @@ function closeProjectPage(popHistory = true) {
 }
 
 function stepProject(direction) {
-    const nextIndex = projectIndex + direction;
-    if (nextIndex < 0 || nextIndex >= projectList.length) return;
-    projectIndex = nextIndex;
+    const nextIndex = activeProjectIndex + direction;
+    if (nextIndex < 0 || nextIndex >= activeProjectList.length) return;
+    activeProjectIndex = nextIndex;
     renderProjectPage();
 }
 
@@ -2041,26 +2052,35 @@ function handleKeydown(event) {
     else if (event.key === "ArrowRight") stepProject(1);
 }
 
-// Browser back button / swipe-back closes the project page
 window.addEventListener("popstate", () => {
     if (projectPage.classList.contains("active")) closeProjectPage(false);
 });
 
 document.addEventListener("keydown", handleKeydown);
 
-allClickableItems.forEach((item, index) => {
-    item.addEventListener("click", () => {
-        // Archive cards can point at a full project row via data-target-id
-        const targetId = item.dataset.targetId;
-        if (targetId) {
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-                const targetIndex = allClickableItems.indexOf(targetEl);
-                openProjectPage(allClickableItems, targetIndex !== -1 ? targetIndex : index, targetEl);
-                return;
-            }
-        }
-        openProjectPage(allClickableItems, index, item);
+
+/* =========================================================
+   CLICK EVENT HANDLERS
+========================================================= */
+// 1. Khi click trong SELECTED WORK -> chạy chuỗi worksProjectList (4 Work + nối các bài Archive còn lại)
+worksProjectRows.forEach((row, index) => {
+    row.addEventListener("click", () => {
+        openProjectPage(worksProjectList, index, row);
+    });
+});
+
+// Click ảnh sticky bên trái mục Work -> chạy chuỗi worksProjectList
+worksMediaItems.forEach((media, index) => {
+    media.addEventListener("click", () => {
+        const row = worksProjectRows[index];
+        openProjectPage(worksProjectList, index, row || media);
+    });
+});
+
+// 2. Khi click trong ARCHIVE -> duyệt tuần tự 9 bài theo layout Archive
+archiveCards.forEach((card, index) => {
+    card.addEventListener("click", () => {
+        openProjectPage(archiveProjectList, index, card);
     });
 });
 
@@ -2072,16 +2092,12 @@ backToWorkBtn.addEventListener("click", () => closeProjectPage());
 /* =========================================================
    SELECTED WORK: STICKY MEDIA CROSSFADE
 ========================================================= */
-const worksMediaItems = [...document.querySelectorAll("#worksSection .works-media-item")];
-const worksProjectRows = [...document.querySelectorAll("#worksSection .project-row")];
-
 function setActiveWorksMedia(index) {
     worksMediaItems.forEach((item, i) => {
         item.classList.toggle("active", i === index);
     });
 }
 
-// Whichever row crosses the middle band of the viewport decides which image is shown
 if (worksProjectRows.length && worksMediaItems.length && "IntersectionObserver" in window) {
     const worksObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -2098,25 +2114,14 @@ if (worksProjectRows.length && worksMediaItems.length && "IntersectionObserver" 
     worksProjectRows.forEach(row => worksObserver.observe(row));
 }
 
-// Hovering a title reveals the color of its sticky image
 worksProjectRows.forEach((row, index) => {
     row.addEventListener("mouseenter", () => worksMediaItems[index]?.classList.add("hovered"));
     row.addEventListener("mouseleave", () => worksMediaItems[index]?.classList.remove("hovered"));
 });
 
-// Clicking the sticky image opens the matching project
-worksMediaItems.forEach((media, index) => {
-    media.addEventListener("click", () => {
-        const row = worksProjectRows[index];
-        if (!row) return;
-        const fullIndex = allClickableItems.indexOf(row);
-        openProjectPage(allClickableItems, fullIndex !== -1 ? fullIndex : index, row);
-    });
-});
-
 
 /* =========================================================
-   CONTINUOUS SCROLL REVEAL (2-WAY EASE-IN KHI SCROLL UP/DOWN)
+   SCROLL REVEAL (EASE IN AS ELEMENTS ENTER VIEWPORT)
 ========================================================= */
 if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
@@ -2126,39 +2131,15 @@ if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-mot
         `.intro-kicker, .intro-text, .about-block, ${rowSelector}, .archive-item, .contact-inner`
     );
 
-    // Theo dõi hướng cuộn của người dùng
-    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
-    let isScrollingUp = false;
-
-    window.addEventListener("scroll", () => {
-        const currentY = window.pageYOffset || document.documentElement.scrollTop;
-        isScrollingUp = currentY < lastScrollY;
-        lastScrollY = currentY;
-    }, { passive: true });
-
     const revealObserver = new IntersectionObserver(entries => {
-        entries.forEach((entry, i) => {
-            if (entry.isIntersecting) {
-                // Tùy theo hướng scroll mà điều chỉnh offset bắt đầu
-                if (isScrollingUp) {
-                    entry.target.classList.add("from-top");
-                } else {
-                    entry.target.classList.remove("from-top");
-                }
-
-                // Stagger nhẹ cho các mục xuất hiện đồng thời
-                entry.target.style.transitionDelay = `${(i % 5) * 60}ms`;
+        entries
+            .filter(entry => entry.isIntersecting)
+            .forEach((entry, i) => {
+                entry.target.style.transitionDelay = `${i * 80}ms`;
                 entry.target.classList.add("is-visible");
-            } else {
-                // Khi phần tử ra khỏi màn hình: reset lại trạng thái để khi lướt ngược lại sẽ ease-in lại
-                entry.target.style.transitionDelay = "0ms";
-                entry.target.classList.remove("is-visible");
-            }
-        });
-    }, { 
-        threshold: 0.1, 
-        rootMargin: "-4% 0px -4% 0px" // Vùng an toàn để không bị nháy mép màn hình
-    });
+                revealObserver.unobserve(entry.target);
+            });
+    }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
 
     revealTargets.forEach(el => {
         el.classList.add("reveal");
