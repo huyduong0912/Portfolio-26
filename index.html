@@ -30,6 +30,67 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
+      body.is-loading {
+        overflow: hidden;
+      }
+
+      .loading-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: grid;
+        place-items: center;
+        padding: 8vw;
+        background: #ffffff;
+        opacity: 1;
+        visibility: visible;
+        transition:
+          opacity 0.45s ease,
+          visibility 0.45s ease;
+      }
+
+      .loading-screen.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .loading-content {
+        width: min(100%, 440px);
+      }
+
+      .loading-title {
+        font-size: clamp(30px, 4vw, 56px);
+        font-weight: 400;
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+      }
+
+      .loading-status {
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+        margin-top: 2rem;
+        font-size: 14px;
+        color: #666666;
+      }
+
+      .loading-track {
+        height: 2px;
+        margin-top: 0.7rem;
+        overflow: hidden;
+        background: #e6e6e6;
+      }
+
+      .loading-progress {
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.25s ease;
+      }
+
       a {
         color: inherit;
         text-decoration: none;
@@ -136,6 +197,10 @@
         visibility: hidden;
         will-change: opacity;
         pointer-events: none;
+      }
+
+      .section-titles-wrap.is-navigating .scene-title-item {
+        transition: opacity 0.25s ease;
       }
 
       /* NAVIGATION */
@@ -1120,7 +1185,34 @@
     </style>
   </head>
 
-  <body>
+  <body class="is-loading" aria-busy="true">
+    <div
+      class="loading-screen"
+      id="loadingScreen"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading portfolio media"
+    >
+      <div class="loading-content">
+        <p class="loading-title">HuyDuong’s Portfolio</p>
+        <div class="loading-status">
+          <span id="loadingMessage">Preparing portfolio…</span>
+          <span id="loadingCount">0%</span>
+        </div>
+        <div
+          class="loading-track"
+          role="progressbar"
+          aria-label="Portfolio media loading progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          id="loadingTrack"
+        >
+          <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- SITE HEADER -->
     <header class="site-header">
       <div class="header-left">
@@ -1763,6 +1855,9 @@ The project explores the similarities between the Vietnamese traditional market 
           >
           <a href="mailto:912duonghuy@gmail.com">912duonghuy@gmail.com</a>
           <a href="tel:+84906912005">(+84) 906912005</a>
+          <a href="Duong_Duc_Huy_Brand_Designer_CV.pdf" download
+            >Resume (PDF)</a
+          >
           <a
             href="https://www.instagram.com/huyduong.indd"
             target="_blank"
@@ -1862,6 +1957,7 @@ The project explores the similarities between the Vietnamese traditional market 
       const titleWorks = document.getElementById("titleWorks");
       const titleArchives = document.getElementById("titleArchives");
       const titleContact = document.getElementById("titleContact");
+      const sectionTitlesWrap = document.querySelector(".section-titles-wrap");
 
       const navItems = [...document.querySelectorAll(".nav-item")];
 
@@ -1922,6 +2018,8 @@ The project explores the similarities between the Vietnamese traditional market 
       let activeProjectList = [];
       let activeProjectIndex = 0;
       let previousTriggerEl = null;
+      let forcedHeaderSection = null;
+      let sectionNavigationId = 0;
 
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
@@ -1933,6 +2031,12 @@ The project explores the similarities between the Vietnamese traditional market 
       function updateHeaderTitles() {
         if (document.body.classList.contains("project-open")) {
           setTitleOpacity(0, 0, 0, 0);
+          return;
+        }
+
+        if (forcedHeaderSection) {
+          setSectionHeaderTitle(forcedHeaderSection);
+          updateDarkUI();
           return;
         }
 
@@ -1998,6 +2102,60 @@ The project explores the similarities between the Vietnamese traditional market 
         });
       }
 
+      function setSectionHeaderTitle(sectionId) {
+        setTitleOpacity(
+          sectionId === "aboutSection" ? 1 : 0,
+          sectionId === "worksSection" ? 1 : 0,
+          sectionId === "archivesSection" ? 1 : 0,
+          sectionId === "contactSection" ? 1 : 0,
+        );
+        updateNavActive(sectionId);
+      }
+
+      function navigateToSection(targetEl) {
+        if (!targetEl) return;
+
+        const projectWasOpen = projectPage.classList.contains("active");
+        closeProjectPage(false);
+        if (projectWasOpen && window.location.hash === "#project") {
+          history.replaceState(history.state, "", `#${targetEl.id}`);
+        }
+        const navigationId = ++sectionNavigationId;
+        forcedHeaderSection = targetEl.id;
+        sectionTitlesWrap?.classList.add("is-navigating");
+        setSectionHeaderTitle(targetEl.id);
+        targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        let previousScrollY = window.scrollY;
+        const navigationStartedAt = performance.now();
+        let stableFrames = 0;
+
+        function finishWhenScrollStops() {
+          if (navigationId !== sectionNavigationId) return;
+
+          if (
+            performance.now() - navigationStartedAt >= 250 &&
+            Math.abs(window.scrollY - previousScrollY) < 0.5
+          ) {
+            stableFrames += 1;
+          } else {
+            previousScrollY = window.scrollY;
+            stableFrames = 0;
+          }
+
+          if (stableFrames >= 8) {
+            forcedHeaderSection = null;
+            sectionTitlesWrap?.classList.remove("is-navigating");
+            updateHeaderTitles();
+            return;
+          }
+
+          window.requestAnimationFrame(finishWhenScrollStops);
+        }
+
+        window.requestAnimationFrame(finishWhenScrollStops);
+      }
+
       function updateNavActive(targetId) {
         navItems.forEach((item) => {
           item.classList.toggle("active", item.dataset.target === targetId);
@@ -2018,15 +2176,12 @@ The project explores the similarities between the Vietnamese traditional market 
 ========================================================= */
       document.querySelector(".logo")?.addEventListener("click", (e) => {
         e.preventDefault();
-        closeProjectPage();
-        aboutSection.scrollIntoView({ behavior: "smooth" });
+        navigateToSection(aboutSection);
       });
 
       navItems.forEach((item) => {
         item.addEventListener("click", () => {
-          closeProjectPage();
-          const targetEl = document.getElementById(item.dataset.target);
-          if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+          navigateToSection(document.getElementById(item.dataset.target));
         });
       });
 
@@ -2034,7 +2189,6 @@ The project explores the similarities between the Vietnamese traditional market 
       window.addEventListener(
         "scroll",
         () => {
-          pauseProjectImagePreloading();
           if (isTicking) return;
           isTicking = true;
           window.requestAnimationFrame(() => {
@@ -2045,29 +2199,16 @@ The project explores the similarities between the Vietnamese traditional market 
         { passive: true },
       );
 
-      projectPage.addEventListener("scroll", pauseProjectImagePreloading, {
-        passive: true,
-      });
-
       window.addEventListener("resize", updateHeaderTitles);
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) scheduleProjectImagePreload();
-      });
-      window.addEventListener(
-        "load",
-        () => {
-          updateHeaderTitles();
-          preloadProjectImages();
-        },
-        { once: true },
-      );
+      window.addEventListener("load", updateHeaderTitles);
 
       const archiveVideos = [
         ...document.querySelectorAll("#archivesSection video"),
       ];
 
-      if ("IntersectionObserver" in window) {
-        const archiveVideoObserver = new IntersectionObserver(
+      function startArchiveVideoObserver() {
+        if ("IntersectionObserver" in window) {
+          const archiveVideoObserver = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               const video = entry.target;
@@ -2083,15 +2224,18 @@ The project explores the similarities between the Vietnamese traditional market 
             });
           },
           { rootMargin: "100px 0px", threshold: 0.15 },
-        );
+          );
 
-        archiveVideos.forEach((video) => archiveVideoObserver.observe(video));
-      } else {
-        archiveVideos.forEach((video) => {
-          video.play().catch((error) => {
-            console.warn("Archive video playback failed:", error);
+          archiveVideos.forEach((video) =>
+            archiveVideoObserver.observe(video),
+          );
+        } else {
+          archiveVideos.forEach((video) => {
+            video.play().catch((error) => {
+              console.warn("Archive video playback failed:", error);
+            });
           });
-        });
+        }
       }
 
       /* =========================================================
@@ -2173,129 +2317,158 @@ The project explores the similarities between the Vietnamese traditional market 
         };
       }
 
-      function preloadProjectImages() {
-        const imageUrls = [];
+      const loadingScreen = document.getElementById("loadingScreen");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const loadingCount = document.getElementById("loadingCount");
+      const loadingTrack = document.getElementById("loadingTrack");
+      const loadingProgress = document.getElementById("loadingProgress");
 
-        [...worksProjectList, ...archiveOnlyProjects].forEach((project) => {
-          getItemData(project).images.forEach((url) => {
-            if (!/\.(mp4|webm)$/i.test(url)) imageUrls.push(url);
-          });
+      function loadImage(url) {
+        return new Promise((resolve) => {
+          const image = new Image();
+          const timeout = window.setTimeout(() => finish(false), 30000);
+          let settled = false;
+
+          function finish(success) {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timeout);
+            resolve(success);
+          }
+
+          image.onload = () => finish(true);
+          image.onerror = () => finish(false);
+          image.src = url;
         });
-
-        queueProjectImagePreloads(imageUrls);
       }
 
-      const queuedProjectImagePreloads = [];
-      const pendingProjectImageLoads = new Set();
-      const preloadedProjectImageUrls = new Set();
-      let activeProjectImagePreload = null;
-      let preloadScheduleId = null;
-      let preloadScheduleUsesIdleCallback = false;
-      let scrollIdleTimer = null;
+      function loadVideoFrame(url) {
+        return new Promise((resolve) => {
+          const video = document.createElement("video");
+          const timeout = window.setTimeout(() => finish(false), 30000);
+          let settled = false;
 
-      function scheduleProjectImagePreload() {
-        if (
-          activeProjectImagePreload ||
-          preloadScheduleId !== null ||
-          !queuedProjectImagePreloads.length ||
-          document.hidden ||
-          document.body.classList.contains("project-open") ||
-          scrollIdleTimer !== null
-        ) {
+          function finish(success) {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timeout);
+            video.pause();
+            resolve(success);
+          }
+
+          video.muted = true;
+          video.playsInline = true;
+          video.preload = "metadata";
+          video.addEventListener("loadeddata", () => finish(true), {
+            once: true,
+          });
+          video.addEventListener("error", () => finish(false), { once: true });
+          video.src = url;
+          video.load();
+        });
+      }
+
+      let portfolioLoadingFinished = false;
+
+      function finishPortfolioLoading() {
+        if (portfolioLoadingFinished) return;
+        portfolioLoadingFinished = true;
+        document.body.classList.remove("is-loading");
+        document.body.setAttribute("aria-busy", "false");
+        loadingScreen.classList.add("is-hidden");
+        loadingScreen.setAttribute("aria-hidden", "true");
+        startArchiveVideoObserver();
+      }
+
+      async function loadPortfolioMedia() {
+        const imageUrls = new Set(
+          [...document.querySelectorAll("img[src]")].map((image) =>
+            new URL(image.getAttribute("src"), document.baseURI).href,
+          ),
+        );
+        const videoUrls = new Set(
+          [...document.querySelectorAll("video source[src], video[src]")].map(
+            (video) =>
+              new URL(
+                video.getAttribute("src") ||
+                  video.querySelector("source")?.getAttribute("src"),
+                document.baseURI,
+              ).href,
+          ),
+        );
+
+        [...worksProjectRows, ...archiveProjectList].forEach((project) => {
+          const data = getItemData(project);
+          data.images.forEach((url) => {
+            const absoluteUrl = new URL(url, document.baseURI).href;
+            if (/\.(mp4|webm)$/i.test(url)) {
+              videoUrls.add(absoluteUrl);
+            } else {
+              imageUrls.add(absoluteUrl);
+            }
+          });
+          if (data.videoSrc) {
+            videoUrls.add(new URL(data.videoSrc, document.baseURI).href);
+          }
+        });
+
+        const tasks = [
+          ...[...imageUrls].map((url) => ({
+            url,
+            type: "image",
+            load: loadImage,
+          })),
+          ...[...videoUrls].map((url) => ({
+            url,
+            type: "video",
+            load: loadVideoFrame,
+          })),
+        ];
+        let completed = 0;
+        let failedImages = 0;
+        let failedVideos = 0;
+        const total = tasks.length;
+
+        function updateLoadingProgress() {
+          const percent = total ? Math.round((completed / total) * 100) : 100;
+          loadingCount.textContent = `${percent}%`;
+          loadingTrack.setAttribute("aria-valuenow", String(percent));
+          loadingProgress.style.transform = `scaleX(${percent / 100})`;
+          loadingMessage.textContent = `Loading media · ${completed} of ${total}`;
+        }
+
+        await Promise.all(
+          tasks.map(async ({ url, type, load }) => {
+            const success = await load(url);
+            if (!success) {
+              if (type === "image") failedImages += 1;
+              else failedVideos += 1;
+              console.error(`Failed to load portfolio media: ${url}`);
+            }
+            completed += 1;
+            updateLoadingProgress();
+          }),
+        );
+
+        if (failedImages || failedVideos) {
+          const failures = [];
+          if (failedImages) {
+            failures.push(
+              `${failedImages} image${failedImages === 1 ? "" : "s"}`,
+            );
+          }
+          if (failedVideos) {
+            failures.push(
+              `${failedVideos} video${failedVideos === 1 ? "" : "s"}`,
+            );
+          }
+          loadingMessage.textContent = `${failures.join(" and ")} unavailable`;
+          window.setTimeout(finishPortfolioLoading, 900);
           return;
         }
 
-        const preloadNextImage = () => {
-          preloadScheduleId = null;
-          if (
-            document.hidden ||
-            document.body.classList.contains("project-open") ||
-            scrollIdleTimer !== null
-          ) {
-            return;
-          }
-
-          const url = queuedProjectImagePreloads.shift();
-          if (!url || pendingProjectImageLoads.has(url)) {
-            scheduleProjectImagePreload();
-            return;
-          }
-
-          const image = new Image();
-          activeProjectImagePreload = image;
-          pendingProjectImageLoads.add(url);
-          image.decoding = "async";
-          image.fetchPriority = "low";
-          image.onload = () => {
-            pendingProjectImageLoads.delete(url);
-            preloadedProjectImageUrls.add(url);
-            activeProjectImagePreload = null;
-            scheduleProjectImagePreload();
-          };
-          image.onerror = () => {
-            console.warn(`Failed to preload project image: ${url}`);
-            pendingProjectImageLoads.delete(url);
-            activeProjectImagePreload = null;
-            scheduleProjectImagePreload();
-          };
-          image.src = url;
-        };
-
-        if ("requestIdleCallback" in window) {
-          preloadScheduleUsesIdleCallback = true;
-          preloadScheduleId = window.requestIdleCallback(preloadNextImage, {
-            timeout: 1500,
-          });
-        } else {
-          preloadScheduleUsesIdleCallback = false;
-          preloadScheduleId = window.setTimeout(preloadNextImage, 300);
-        }
-      }
-
-      function queueProjectImagePreloads(urls, prioritize = false) {
-        const imageUrls = [
-          ...new Set(urls.filter((url) => !/\.(mp4|webm)$/i.test(url))),
-        ].filter(
-          (url) =>
-            !pendingProjectImageLoads.has(url) &&
-            !preloadedProjectImageUrls.has(url),
-        );
-        const queued = new Set(queuedProjectImagePreloads);
-        const newUrls = imageUrls.filter((url) => !queued.has(url));
-
-        if (prioritize) {
-          const prioritizedUrls = new Set(imageUrls);
-          const remainingUrls = queuedProjectImagePreloads.filter(
-            (url) => !prioritizedUrls.has(url),
-          );
-          queuedProjectImagePreloads.splice(
-            0,
-            queuedProjectImagePreloads.length,
-            ...imageUrls,
-            ...remainingUrls,
-          );
-        } else {
-          queuedProjectImagePreloads.push(...newUrls);
-        }
-
-        scheduleProjectImagePreload();
-      }
-
-      function pauseProjectImagePreloading() {
-        if (preloadScheduleId !== null) {
-          if (preloadScheduleUsesIdleCallback) {
-            window.cancelIdleCallback(preloadScheduleId);
-          } else {
-            window.clearTimeout(preloadScheduleId);
-          }
-          preloadScheduleId = null;
-        }
-
-        window.clearTimeout(scrollIdleTimer);
-        scrollIdleTimer = window.setTimeout(() => {
-          scrollIdleTimer = null;
-          scheduleProjectImagePreload();
-        }, 700);
+        loadingMessage.textContent = "Portfolio ready";
+        window.setTimeout(finishPortfolioLoading, 300);
       }
 
       /* =========================================================
@@ -2443,10 +2616,6 @@ The project explores the similarities between the Vietnamese traditional market 
         activeProjectIndex = index;
         previousTriggerEl = trigger || null;
 
-        queueProjectImagePreloads(
-          getItemData(activeProjectList[activeProjectIndex]).images,
-          true,
-        );
         renderProjectPage();
 
         projectPage.classList.add("active");
@@ -2472,7 +2641,6 @@ The project explores the similarities between the Vietnamese traditional market 
 
         document.body.style.overflow = "";
         if (previousTriggerEl) previousTriggerEl.focus();
-        scheduleProjectImagePreload();
 
         updateHeaderTitles();
 
@@ -2605,6 +2773,11 @@ The project explores the similarities between the Vietnamese traditional market 
 
       /* INITIAL RUN */
       updateHeaderTitles();
+      loadPortfolioMedia().catch((error) => {
+        console.error("Portfolio media loading could not start:", error);
+        loadingMessage.textContent = "Media loading was interrupted.";
+        window.setTimeout(finishPortfolioLoading, 900);
+      });
     </script>
   </body>
 </html>
