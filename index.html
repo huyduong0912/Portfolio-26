@@ -2026,6 +2026,7 @@ The project explores the similarities between the Vietnamese traditional market 
       window.addEventListener(
         "scroll",
         () => {
+          pauseProjectImagePreloading();
           if (isTicking) return;
           isTicking = true;
           window.requestAnimationFrame(() => {
@@ -2036,8 +2037,22 @@ The project explores the similarities between the Vietnamese traditional market 
         { passive: true },
       );
 
+      projectPage.addEventListener("scroll", pauseProjectImagePreloading, {
+        passive: true,
+      });
+
       window.addEventListener("resize", updateHeaderTitles);
-      window.addEventListener("load", updateHeaderTitles);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) scheduleProjectImagePreload();
+      });
+      window.addEventListener(
+        "load",
+        () => {
+          updateHeaderTitles();
+          preloadProjectImages();
+        },
+        { once: true },
+      );
 
       const archiveVideos = [
         ...document.querySelectorAll("#archivesSection video"),
@@ -2150,6 +2165,131 @@ The project explores the similarities between the Vietnamese traditional market 
         };
       }
 
+      function preloadProjectImages() {
+        const imageUrls = [];
+
+        [...worksProjectList, ...archiveOnlyProjects].forEach((project) => {
+          getItemData(project).images.forEach((url) => {
+            if (!/\.(mp4|webm)$/i.test(url)) imageUrls.push(url);
+          });
+        });
+
+        queueProjectImagePreloads(imageUrls);
+      }
+
+      const queuedProjectImagePreloads = [];
+      const pendingProjectImageLoads = new Set();
+      const preloadedProjectImageUrls = new Set();
+      let activeProjectImagePreload = null;
+      let preloadScheduleId = null;
+      let preloadScheduleUsesIdleCallback = false;
+      let scrollIdleTimer = null;
+
+      function scheduleProjectImagePreload() {
+        if (
+          activeProjectImagePreload ||
+          preloadScheduleId !== null ||
+          !queuedProjectImagePreloads.length ||
+          document.hidden ||
+          document.body.classList.contains("project-open") ||
+          scrollIdleTimer !== null
+        ) {
+          return;
+        }
+
+        const preloadNextImage = () => {
+          preloadScheduleId = null;
+          if (
+            document.hidden ||
+            document.body.classList.contains("project-open") ||
+            scrollIdleTimer !== null
+          ) {
+            return;
+          }
+
+          const url = queuedProjectImagePreloads.shift();
+          if (!url || pendingProjectImageLoads.has(url)) {
+            scheduleProjectImagePreload();
+            return;
+          }
+
+          const image = new Image();
+          activeProjectImagePreload = image;
+          pendingProjectImageLoads.add(url);
+          image.decoding = "async";
+          image.fetchPriority = "low";
+          image.onload = () => {
+            pendingProjectImageLoads.delete(url);
+            preloadedProjectImageUrls.add(url);
+            activeProjectImagePreload = null;
+            scheduleProjectImagePreload();
+          };
+          image.onerror = () => {
+            console.warn(`Failed to preload project image: ${url}`);
+            pendingProjectImageLoads.delete(url);
+            activeProjectImagePreload = null;
+            scheduleProjectImagePreload();
+          };
+          image.src = url;
+        };
+
+        if ("requestIdleCallback" in window) {
+          preloadScheduleUsesIdleCallback = true;
+          preloadScheduleId = window.requestIdleCallback(preloadNextImage, {
+            timeout: 1500,
+          });
+        } else {
+          preloadScheduleUsesIdleCallback = false;
+          preloadScheduleId = window.setTimeout(preloadNextImage, 300);
+        }
+      }
+
+      function queueProjectImagePreloads(urls, prioritize = false) {
+        const imageUrls = [
+          ...new Set(urls.filter((url) => !/\.(mp4|webm)$/i.test(url))),
+        ].filter(
+          (url) =>
+            !pendingProjectImageLoads.has(url) &&
+            !preloadedProjectImageUrls.has(url),
+        );
+        const queued = new Set(queuedProjectImagePreloads);
+        const newUrls = imageUrls.filter((url) => !queued.has(url));
+
+        if (prioritize) {
+          const prioritizedUrls = new Set(imageUrls);
+          const remainingUrls = queuedProjectImagePreloads.filter(
+            (url) => !prioritizedUrls.has(url),
+          );
+          queuedProjectImagePreloads.splice(
+            0,
+            queuedProjectImagePreloads.length,
+            ...imageUrls,
+            ...remainingUrls,
+          );
+        } else {
+          queuedProjectImagePreloads.push(...newUrls);
+        }
+
+        scheduleProjectImagePreload();
+      }
+
+      function pauseProjectImagePreloading() {
+        if (preloadScheduleId !== null) {
+          if (preloadScheduleUsesIdleCallback) {
+            window.cancelIdleCallback(preloadScheduleId);
+          } else {
+            window.clearTimeout(preloadScheduleId);
+          }
+          preloadScheduleId = null;
+        }
+
+        window.clearTimeout(scrollIdleTimer);
+        scrollIdleTimer = window.setTimeout(() => {
+          scrollIdleTimer = null;
+          scheduleProjectImagePreload();
+        }, 700);
+      }
+
       /* =========================================================
    PROJECT PAGE: RENDERING
 ========================================================= */
@@ -2217,7 +2357,7 @@ The project explores the similarities between the Vietnamese traditional market 
           hero.className = "modal-media-item modal-image";
           hero.src = data.images[0];
           hero.alt = data.title;
-          hero.loading = "lazy";
+          hero.loading = "eager";
         }
         if (!hero) return;
 
@@ -2244,7 +2384,8 @@ The project explores the similarities between the Vietnamese traditional market 
             const img = document.createElement("img");
             img.src = url;
             img.alt = `${data.title} - ${i + 1}`;
-            img.loading = "lazy";
+            img.loading = "eager";
+            img.decoding = "async";
             img.onload = () =>
               markOrientation(img, img.naturalWidth, img.naturalHeight);
             modalGalleryMedia.appendChild(img);
@@ -2294,6 +2435,10 @@ The project explores the similarities between the Vietnamese traditional market 
         activeProjectIndex = index;
         previousTriggerEl = trigger || null;
 
+        queueProjectImagePreloads(
+          getItemData(activeProjectList[activeProjectIndex]).images,
+          true,
+        );
         renderProjectPage();
 
         projectPage.classList.add("active");
@@ -2319,6 +2464,7 @@ The project explores the similarities between the Vietnamese traditional market 
 
         document.body.style.overflow = "";
         if (previousTriggerEl) previousTriggerEl.focus();
+        scheduleProjectImagePreload();
 
         updateHeaderTitles();
 
