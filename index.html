@@ -812,10 +812,10 @@
 
       .reveal {
         opacity: 0;
-        transform: translateY(32px);
+        transform: translateY(16px);
         transition:
-          opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-          transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+          opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .reveal.is-visible {
@@ -1524,7 +1524,7 @@
           <!-- Dau An -->
           <div class="archive-item" data-target-id="projectDauAn">
             <div class="archive-media">
-              <video autoplay muted loop playsinline webkit-playsinline>
+              <video muted loop playsinline webkit-playsinline preload="none">
                 <source src="motion_2.mp4" type="video/mp4" />
               </video>
             </div>
@@ -1664,7 +1664,7 @@ The final outcome is a physical calendar installation that gradually transforms 
 **Outcome:** The final work was presented as a projection mapping performance, combining graphic design, 2D and 3D motion, sound and spatial projection to create an audiovisual journey around movement, memory and exchange."
           >
             <div class="archive-media">
-              <video autoplay muted loop playsinline webkit-playsinline>
+              <video muted loop playsinline webkit-playsinline preload="none">
                 <source src="Flux/TN/Terang_sample 1.mp4" type="video/mp4" />
               </video>
             </div>
@@ -1697,7 +1697,7 @@ The concept was translated into a projection mapping animation designed to loop 
 **Result:** The work was selected for AWAKE LIGHT FESTIVAL 2026 in Đắk Lắk and presented as part of the festival’s official projection mapping programme, alongside the Selected Artists Studio Exhibition."
           >
             <div class="archive-media">
-              <video autoplay muted loop playsinline webkit-playsinline>
+              <video muted loop playsinline webkit-playsinline preload="none">
                 <source
                   src="Flux/Awake/awake split view.mp4"
                   type="video/mp4"
@@ -1732,7 +1732,7 @@ The project explores the similarities between the Vietnamese traditional market 
 **Result:** The project won the VJ:MAZED competition at City Tết Fest and was later exhibited at Bangkok Design Week 2026."
           >
             <div class="archive-media">
-              <video autoplay muted loop playsinline webkit-playsinline>
+              <video muted loop playsinline webkit-playsinline preload="none">
                 <source
                   src="Flux/MKOMK/Glitching Kiosks 3.mp4"
                   type="video/mp4"
@@ -2038,6 +2038,38 @@ The project explores the similarities between the Vietnamese traditional market 
 
       window.addEventListener("resize", updateHeaderTitles);
       window.addEventListener("load", updateHeaderTitles);
+
+      const archiveVideos = [
+        ...document.querySelectorAll("#archivesSection video"),
+      ];
+
+      if ("IntersectionObserver" in window) {
+        const archiveVideoObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const video = entry.target;
+              if (entry.isIntersecting) {
+                video.play().catch((error) => {
+                  if (error.name !== "AbortError") {
+                    console.warn("Archive video playback failed:", error);
+                  }
+                });
+              } else {
+                video.pause();
+              }
+            });
+          },
+          { rootMargin: "100px 0px", threshold: 0.15 },
+        );
+
+        archiveVideos.forEach((video) => archiveVideoObserver.observe(video));
+      } else {
+        archiveVideos.forEach((video) => {
+          video.play().catch((error) => {
+            console.warn("Archive video playback failed:", error);
+          });
+        });
+      }
 
       /* =========================================================
    PROJECT PAGE: DATA RETRIEVAL
@@ -2403,8 +2435,7 @@ The project explores the similarities between the Vietnamese traditional market 
           (entries) => {
             entries
               .filter((entry) => entry.isIntersecting)
-              .forEach((entry, i) => {
-                entry.target.style.transitionDelay = `${i * 80}ms`;
+              .forEach((entry) => {
                 entry.target.classList.add("is-visible");
                 revealObserver.unobserve(entry.target);
               });
