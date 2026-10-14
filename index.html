@@ -91,6 +91,18 @@
         transition: transform 0.25s ease;
       }
 
+      .loading-retry {
+        margin-top: 1.25rem;
+        font-size: 14px;
+        color: #666666;
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+      }
+
+      .loading-retry:hover {
+        color: #000000;
+      }
+
       a {
         color: inherit;
         text-decoration: none;
@@ -1210,6 +1222,9 @@
         >
           <div class="loading-progress" id="loadingProgress"></div>
         </div>
+        <button class="loading-retry" id="loadingRetry" type="button" hidden>
+          Retry video loading
+        </button>
       </div>
     </div>
 
@@ -2322,6 +2337,9 @@ The project explores the similarities between the Vietnamese traditional market 
       const loadingCount = document.getElementById("loadingCount");
       const loadingTrack = document.getElementById("loadingTrack");
       const loadingProgress = document.getElementById("loadingProgress");
+      const loadingRetry = document.getElementById("loadingRetry");
+      const failedVideoUrls = new Set();
+      let mediaLoadInProgress = false;
 
       function loadImage(url) {
         return new Promise((resolve) => {
@@ -2358,7 +2376,7 @@ The project explores the similarities between the Vietnamese traditional market 
 
           video.muted = true;
           video.playsInline = true;
-          video.preload = "metadata";
+          video.preload = "auto";
           video.addEventListener("loadeddata", () => finish(true), {
             once: true,
           });
@@ -2380,7 +2398,14 @@ The project explores the similarities between the Vietnamese traditional market 
         startArchiveVideoObserver();
       }
 
-      async function loadPortfolioMedia() {
+      async function loadPortfolioMedia(videoUrlsToRetry = null) {
+        if (mediaLoadInProgress) return;
+        mediaLoadInProgress = true;
+        loadingRetry.hidden = true;
+        loadingCount.textContent = "0%";
+        loadingTrack.setAttribute("aria-valuenow", "0");
+        loadingProgress.style.transform = "scaleX(0)";
+
         const imageUrls = new Set(
           [...document.querySelectorAll("img[src]")].map((image) =>
             new URL(image.getAttribute("src"), document.baseURI).href,
@@ -2412,7 +2437,7 @@ The project explores the similarities between the Vietnamese traditional market 
           }
         });
 
-        const tasks = [
+        const allTasks = [
           ...[...imageUrls].map((url) => ({
             url,
             type: "image",
@@ -2424,9 +2449,15 @@ The project explores the similarities between the Vietnamese traditional market 
             load: loadVideoFrame,
           })),
         ];
+        const tasks = videoUrlsToRetry
+          ? [...videoUrlsToRetry].map((url) => ({
+              url,
+              type: "video",
+              load: loadVideoFrame,
+            }))
+          : allTasks;
         let completed = 0;
         let failedImages = 0;
-        let failedVideos = 0;
         const total = tasks.length;
 
         function updateLoadingProgress() {
@@ -2437,39 +2468,64 @@ The project explores the similarities between the Vietnamese traditional market 
           loadingMessage.textContent = `Loading media · ${completed} of ${total}`;
         }
 
-        await Promise.all(
-          tasks.map(async ({ url, type, load }) => {
-            const success = await load(url);
-            if (!success) {
-              if (type === "image") failedImages += 1;
-              else failedVideos += 1;
-              console.error(`Failed to load portfolio media: ${url}`);
-            }
-            completed += 1;
-            updateLoadingProgress();
-          }),
-        );
+        try {
+          let nextTaskIndex = 0;
+          const workers = Array.from(
+            { length: Math.min(4, tasks.length) },
+            async () => {
+              while (nextTaskIndex < tasks.length) {
+                const task = tasks[nextTaskIndex++];
+                const success = await task.load(task.url);
+                if (!success) {
+                  if (task.type === "image") {
+                    failedImages += 1;
+                    console.error(`Failed to load portfolio media: ${task.url}`);
+                  } else {
+                    failedVideoUrls.add(task.url);
+                    console.error(`Failed to prepare portfolio video: ${task.url}`);
+                  }
+                } else if (task.type === "video") {
+                  failedVideoUrls.delete(task.url);
+                }
+                completed += 1;
+                updateLoadingProgress();
+              }
+            },
+          );
+          await Promise.all(workers);
 
-        if (failedImages || failedVideos) {
-          const failures = [];
+          if (failedVideoUrls.size) {
+            const count = failedVideoUrls.size;
+            loadingMessage.textContent = `${count} video${count === 1 ? "" : "s"} not ready. Retry to continue.`;
+            loadingRetry.hidden = false;
+            return;
+          }
+
           if (failedImages) {
-            failures.push(
-              `${failedImages} image${failedImages === 1 ? "" : "s"}`,
-            );
+            loadingMessage.textContent = `${failedImages} image${failedImages === 1 ? "" : "s"} unavailable`;
+          } else {
+            loadingMessage.textContent = "Portfolio ready";
           }
-          if (failedVideos) {
-            failures.push(
-              `${failedVideos} video${failedVideos === 1 ? "" : "s"}`,
-            );
-          }
-          loadingMessage.textContent = `${failures.join(" and ")} unavailable`;
-          window.setTimeout(finishPortfolioLoading, 900);
-          return;
+          window.setTimeout(finishPortfolioLoading, 300);
+        } finally {
+          mediaLoadInProgress = false;
         }
-
-        loadingMessage.textContent = "Portfolio ready";
-        window.setTimeout(finishPortfolioLoading, 300);
       }
+
+      function handlePortfolioMediaLoadError(error) {
+        console.error("Portfolio media loading was interrupted:", error);
+        mediaLoadInProgress = false;
+        loadingMessage.textContent =
+          "Media loading was interrupted. Retry to continue.";
+        loadingRetry.hidden = false;
+      }
+
+      function retryPortfolioMedia() {
+        const retryUrls = failedVideoUrls.size ? failedVideoUrls : null;
+        loadPortfolioMedia(retryUrls).catch(handlePortfolioMediaLoadError);
+      }
+
+      loadingRetry.addEventListener("click", retryPortfolioMedia);
 
       /* =========================================================
    PROJECT PAGE: RENDERING
@@ -2773,11 +2829,7 @@ The project explores the similarities between the Vietnamese traditional market 
 
       /* INITIAL RUN */
       updateHeaderTitles();
-      loadPortfolioMedia().catch((error) => {
-        console.error("Portfolio media loading could not start:", error);
-        loadingMessage.textContent = "Media loading was interrupted.";
-        window.setTimeout(finishPortfolioLoading, 900);
-      });
+      loadPortfolioMedia().catch(handlePortfolioMediaLoadError);
     </script>
   </body>
 </html>
