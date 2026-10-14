@@ -1286,7 +1286,7 @@
             Vietnam, working across the boundaries of each.
           </p>
 
-<!-- AWARDS -->
+          <!-- AWARDS -->
           <div class="about-block">
             <div class="about-label">Awards</div>
             <div class="about-content">
@@ -1313,8 +1313,10 @@
               </div>
               <div class="about-entry">
                 <strong
-                  >AWAKE LIGHT FESTIVAL 2026 <br/>
-                  <span class="entry-role">Selected for official projection mapping programme</span>
+                  >AWAKE LIGHT FESTIVAL 2026 <br />
+                  <span class="entry-role"
+                    >Selected for official projection mapping programme</span
+                  >
                 </strong>
                 <span>Projection Mapping</span>
               </div>
@@ -1353,12 +1355,14 @@
                     >Co-Director | Graphic & Motion Designer</span
                   >
                 </strong>
-                <span>Mar 2025 - Now</span>
+                <span>Mar 2025 - Oct 2026</span>
               </div>
               <div class="about-entry">
                 <strong
                   >Vietnam Access Conference<br />
-                  <span class="entry-role">Academic Client Collaboration Brand Identity Designer</span>
+                  <span class="entry-role"
+                    >Academic Client Collaboration Brand Identity Designer</span
+                  >
                 </strong>
                 <span>Mar 2025 - May 2025</span>
               </div>
@@ -1379,7 +1383,8 @@
               <div class="about-entry">
                 <strong>Software</strong>
                 <span
-                  >InDesign, Illustrator, Photoshop, After Effects, TouchDesigner, Resolume Arena, Blender</span
+                  >InDesign, Illustrator, Photoshop, After Effects,
+                  TouchDesigner, Resolume Arena, Blender</span
                 >
               </div>
               <div class="about-entry">
@@ -1426,8 +1431,6 @@
               </div>
             </div>
           </div>
-
-          
         </div>
       </section>
 
@@ -1541,8 +1544,8 @@
               <div class="row-info">
                 <div class="project-title">Vietnam Access Conference</div>
                 <p class="project-hook">
-                  A proposed identity unlocking Vietnam’s investment
-                  potential. · Asia Oceania Silver, The Best Brand Awards 2025
+                  A proposed identity unlocking Vietnam’s investment potential.
+                  · Asia Oceania Silver, The Best Brand Awards 2025
                 </p>
                 <div class="project-meta">
                   <span class="project-category"
@@ -2224,26 +2227,24 @@ The project explores the similarities between the Vietnamese traditional market 
       function startArchiveVideoObserver() {
         if ("IntersectionObserver" in window) {
           const archiveVideoObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              const video = entry.target;
-              if (entry.isIntersecting) {
-                video.play().catch((error) => {
-                  if (error.name !== "AbortError") {
-                    console.warn("Archive video playback failed:", error);
-                  }
-                });
-              } else {
-                video.pause();
-              }
-            });
-          },
-          { rootMargin: "100px 0px", threshold: 0.15 },
+            (entries) => {
+              entries.forEach((entry) => {
+                const video = entry.target;
+                if (entry.isIntersecting) {
+                  video.play().catch((error) => {
+                    if (error.name !== "AbortError") {
+                      console.warn("Archive video playback failed:", error);
+                    }
+                  });
+                } else {
+                  video.pause();
+                }
+              });
+            },
+            { rootMargin: "100px 0px", threshold: 0.15 },
           );
 
-          archiveVideos.forEach((video) =>
-            archiveVideoObserver.observe(video),
-          );
+          archiveVideos.forEach((video) => archiveVideoObserver.observe(video));
         } else {
           archiveVideos.forEach((video) => {
             video.play().catch((error) => {
@@ -2407,8 +2408,9 @@ The project explores the similarities between the Vietnamese traditional market 
         loadingProgress.style.transform = "scaleX(0)";
 
         const imageUrls = new Set(
-          [...document.querySelectorAll("img[src]")].map((image) =>
-            new URL(image.getAttribute("src"), document.baseURI).href,
+          [...document.querySelectorAll("img[src]")].map(
+            (image) =>
+              new URL(image.getAttribute("src"), document.baseURI).href,
           ),
         );
         const videoUrls = new Set(
@@ -2479,10 +2481,14 @@ The project explores the similarities between the Vietnamese traditional market 
                 if (!success) {
                   if (task.type === "image") {
                     failedImages += 1;
-                    console.error(`Failed to load portfolio media: ${task.url}`);
+                    console.error(
+                      `Failed to load portfolio media: ${task.url}`,
+                    );
                   } else {
                     failedVideoUrls.add(task.url);
-                    console.error(`Failed to prepare portfolio video: ${task.url}`);
+                    console.error(
+                      `Failed to prepare portfolio video: ${task.url}`,
+                    );
                   }
                 } else if (task.type === "video") {
                   failedVideoUrls.delete(task.url);
