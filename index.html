@@ -210,16 +210,20 @@
         letter-spacing: -0.05em;
         margin: 0;
         opacity: 0;
-        visibility: hidden;
-        will-change: opacity;
+        visibility: visible;
+        will-change: opacity, transform;
         pointer-events: none;
+        transform: translate3d(0, 10px, 0);
         transition:
-          opacity 0.25s ease,
-          visibility 0.25s ease;
+          opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0.45s ease;
       }
 
       .section-titles-wrap.is-navigating .scene-title-item {
-        transition: opacity 0.25s ease, visibility 0.25s ease;
+        transition:
+          opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       /* NAVIGATION */
@@ -632,22 +636,32 @@
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
+        transform: translate3d(0, 18px, 0);
         transition:
-          opacity 0.25s ease,
-          visibility 0.25s ease;
+          opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0.38s ease;
         padding: 8.5vw 2.5vw;
+        will-change: opacity, transform;
       }
 
       .project-page.active {
         opacity: 1 !important;
         visibility: visible !important;
         pointer-events: auto !important;
+        transform: translate3d(0, 0, 0) !important;
       }
 
       .project-page-inner {
         width: 100%;
         max-width: 1400px;
         margin: 0 auto;
+        opacity: 0;
+        transition: opacity 0.32s ease 0.06s;
+      }
+
+      .project-page.active .project-page-inner {
+        opacity: 1;
       }
 
       .modal-hero-media {
@@ -2128,10 +2142,13 @@ The project explores the similarities between the Vietnamese traditional market 
           [titleArchives, archivesOp],
           [titleContact, contactOp],
         ].forEach(([el, opacity]) => {
-          if (el) {
-            el.style.opacity = opacity;
-            el.style.visibility = opacity > 0.01 ? "visible" : "hidden";
-          }
+          if (!el) return;
+
+          const offset = (1 - opacity) * 10;
+          el.style.opacity = String(opacity);
+          el.style.transform = `translate3d(0, ${offset}px, 0)`;
+          el.style.visibility = "visible";
+          el.style.pointerEvents = "none";
         });
       }
 
@@ -2177,13 +2194,9 @@ The project explores the similarities between the Vietnamese traditional market 
           }
 
           if (stableFrames >= 8) {
-            setSectionHeaderTitle(targetEl.id);
-            window.setTimeout(() => {
-              if (navigationId !== sectionNavigationId) return;
-              forcedHeaderSection = null;
-              sectionTitlesWrap?.classList.remove("is-navigating");
-              updateHeaderTitles();
-            }, 150);
+            forcedHeaderSection = null;
+            sectionTitlesWrap?.classList.remove("is-navigating");
+            updateHeaderTitles();
             return;
           }
 
